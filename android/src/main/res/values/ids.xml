@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <item name="ic_download" type="drawable">
+    @drawable/ic_download
+  </item>
+  <item name="ic_download_done" type="drawable">
+    @drawable/ic_download_done
+  </item>
+  <item name="ic_download_failed" type="drawable">
+    @drawable/ic_download_failed
+  </item>
+  <item name="str_notification_channel_name" type="string">
+    @string/str_notification_channel_name
+  </item>
+</resources>

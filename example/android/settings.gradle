@@ -1,0 +1,6 @@
+rootProject.name = 'DrmVideoDownloaderExample'
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+include ':app'
+
+include ':reactnativedrmvideodownloader'
+project(':reactnativedrmvideodownloader').projectDir = new File(rootProject.projectDir, '../../android')
