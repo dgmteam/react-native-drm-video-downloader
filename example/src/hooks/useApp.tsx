@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import type { DRMVideoRequestModel } from "react-native-drm-video-downloader";
+
 
 export const useApp = () => {
   // const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
