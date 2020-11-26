@@ -1,28 +1,26 @@
 import * as React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DrmVideoDownloader from 'react-native-drm-video-downloader';
+import { DRMVideoState } from 'react-native-drm-video-downloader';
 import { useApp } from './hooks/useApp';
 
 export default function App() {
-  const { videoRequestModel } = useApp();
+  const AppHook = useApp();
 
-  const download = () => {
-    console.log('request download video');
-    DrmVideoDownloader.download(
-      videoRequestModel,
-      (download?: any) => {
-        console.log('result', download);
-      },
-      (error?: any) => {
-        console.log('error', error);
-      }
-    );
-  };
+  React.useEffect(() => {
+    DrmVideoDownloader.registerTrackingEvent();
+    return () => {
+      DrmVideoDownloader.unregisterTrackingEvent();
+    };
+  }, []);
 
   return (
     <View>
-      <TextItem leftText={'Name'} rightText={videoRequestModel?.title} />
-      <TextItem leftText={'Url'} rightText={videoRequestModel?.url} />
+      <TextItem
+        leftText={'Name'}
+        rightText={AppHook.videoRequestModel?.title}
+      />
+      <TextItem leftText={'Url'} rightText={AppHook.videoRequestModel?.url} />
       <TouchableOpacity
         style={[
           {
@@ -34,10 +32,21 @@ export default function App() {
             alignItems: 'center',
           },
         ]}
-        onPress={download}
+        onPress={AppHook.controlDownloadVideo}
       >
-        <Text>{'Download'}</Text>
+        <Text>{AppHook.getButtonText()}</Text>
       </TouchableOpacity>
+
+      <Text
+        style={[
+          {
+            marginTop: 16,
+            fontSize: 16,
+          },
+        ]}
+      >
+        {AppHook.getProgressText()}
+      </Text>
     </View>
   );
 }
