@@ -16,6 +16,13 @@ class Constants {
 
     const val RESULT_PROGRESS = "progress"
     const val RESULT_STATE = "state"
-//    const val RESULT_PROGRESS = "progress"
+
+    const val ERROR_CODE = "error_code"
+    const val ERROR_MESSAGE = "error_message"
+    const val EVENT_NAME_DOWNLOAD_CHANGE_STATE = "DOWNLOAD_CHANGE_STATE"
+    const val EVENT_NAME_DOWNLOAD_FAIL = "DOWNLOAD_FAIL"
+    const val EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS = "DOWNLOAD_CHANGE_PROGRESS"
+    const val EVENT_DOWNLOAD_DRM_VIDEO_NAME = "DownloadDrmVideo"
+    const val EVENT_DOWNLOAD_DRM_VIDEO_ACTION = "action"
   }
 }
