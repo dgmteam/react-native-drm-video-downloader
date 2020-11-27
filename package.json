@@ -1,6 +1,6 @@
 {
   "name": "react-native-drm-video-downloader",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A React Native module allow download and manage drm offline",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

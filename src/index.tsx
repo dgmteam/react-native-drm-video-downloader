@@ -51,7 +51,7 @@ type DrmVideoDownloaderType = {
   getDownloadableStatus(
     videoRequestModel?: DRMVideoRequestModel
   ): Promise<number>;
-  getDownloadableInfo(videoRequestModel?: DRMVideoRequestModel): Promise<DRmVideoInfo>;
+  getDownloadableInfo(videoRequestModel?: DRMVideoRequestModel): Promise<DRMVideoInfo>;
   registerTrackingEvent(): void;
   unregisterTrackingEvent(): void;
   clearAllListener(): void;
