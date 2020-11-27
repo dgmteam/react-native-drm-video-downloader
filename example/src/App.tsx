@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DrmVideoDownloader from 'react-native-drm-video-downloader';
-import { DRMVideoState } from 'react-native-drm-video-downloader';
 import { useApp } from './hooks/useApp';
 
 export default function App() {
