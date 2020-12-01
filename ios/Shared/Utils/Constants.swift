@@ -9,26 +9,27 @@
 import Foundation
 
 class Constants {
-    let DOWNLOAD_NOTIFICATION_CHANNEL_ID = "download_channel";
-    let DOWNLOAD_ACTION_FILE = "actions"
-    let DOWNLOAD_TRACKER_ACTION_FILE = "tracked_actions"
-    let DOWNLOAD_CONTENT_DIRECTORY = "downloads"
+    static let DOWNLOAD_NOTIFICATION_CHANNEL_ID = "download_channel";
+    static let DOWNLOAD_ACTION_FILE = "actions"
+    static let DOWNLOAD_TRACKER_ACTION_FILE = "tracked_actions"
+    static let DOWNLOAD_CONTENT_DIRECTORY = "downloads"
 
-    let VIDEO_ID = "id"
-    let VIDEO_URL = "url"
-    let VIDEO_LICENSE_URL = "licenseUrl"
-    let VIDEO_SCHEME = "scheme"
-    let VIDEO_TITLE = "title"
-    let VIDEO_LICENSE_REQUEST_HEADER = "drmLicenseRequestHeaders"
+    static let VIDEO_ID = "id"
+    static let VIDEO_URL = "url"
+    static let VIDEO_LICENSE_URL = "licenseUrl"
+    static let VIDEO_SCHEME = "scheme"
+    static let VIDEO_TITLE = "title"
+    static let VIDEO_LICENSE_REQUEST_HEADER = "drmLicenseRequestHeaders"
+    static let VIDEO_HEADER_AUTHORIZATION = "Authorization"
 
-    let RESULT_PROGRESS = "progress"
-    let RESULT_STATE = "state"
+    static let RESULT_PROGRESS = "progress"
+    static let RESULT_STATE = "state"
 
-    let ERROR_CODE = "error_code"
-    let ERROR_MESSAGE = "error_message"
-    let EVENT_NAME_DOWNLOAD_CHANGE_STATE = "DOWNLOAD_CHANGE_STATE"
-    let EVENT_NAME_DOWNLOAD_FAIL = "DOWNLOAD_FAIL"
-    let EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS = "DOWNLOAD_CHANGE_PROGRESS"
-    let EVENT_DOWNLOAD_DRM_VIDEO_NAME = "DownloadDrmVideo"
-    let EVENT_DOWNLOAD_DRM_VIDEO_ACTION = "action"
+    static let ERROR_CODE = "error_code"
+    static let ERROR_MESSAGE = "error_message"
+    static let EVENT_NAME_DOWNLOAD_CHANGE_STATE = "DOWNLOAD_CHANGE_STATE"
+    static let EVENT_NAME_DOWNLOAD_FAIL = "DOWNLOAD_FAIL"
+    static let EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS = "DOWNLOAD_CHANGE_PROGRESS"
+    static let EVENT_DOWNLOAD_DRM_VIDEO_NAME = "DownloadDrmVideo"
+    static let EVENT_DOWNLOAD_DRM_VIDEO_ACTION = "action"
 }

@@ -11,6 +11,7 @@
 import Foundation
 import AVFoundation
 
+@available(iOS 11.2, *)
 class AssetPersistenceManager: NSObject {
     // MARK: Properties
     
@@ -126,7 +127,7 @@ class AssetPersistenceManager: NSObject {
         var asset: Asset?
         var bookmarkDataIsStale = false
         do {
-            guard let url = try URL(resolvingBookmarkData: localFileLocation,
+            guard let url = try URL(resolvingBookmarkData:localFileLocation,
                                     bookmarkDataIsStale: &bookmarkDataIsStale) else {
                                         fatalError("Failed to create URL from bookmark!")
             }
@@ -233,6 +234,7 @@ func displayNamesForSelectedMediaOptions(_ mediaSelection: AVMediaSelection) -> 
 /**
  Extend `AssetPersistenceManager` to conform to the `AVAssetDownloadDelegate` protocol.
  */
+@available(iOS 11.2, *)
 extension AssetPersistenceManager: AVAssetDownloadDelegate {
     
     /// Tells the delegate that the task finished transferring data.
@@ -294,6 +296,7 @@ extension AssetPersistenceManager: AVAssetDownloadDelegate {
     }
     
     /// Method called when the an aggregate download task determines the location this asset will be downloaded to.
+    @available(iOS 11.2, *)
     func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask,
                     willDownloadTo location: URL) {
         

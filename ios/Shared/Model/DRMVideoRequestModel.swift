@@ -25,10 +25,11 @@ class DRMVideoRequestModel {
     }
 }
 
+@available(iOS 11.2, *)
 extension DRMVideoRequestModel {
     func toAsset() -> Asset? {
         let stream = Stream.init(name: self.id?, isProtected: true, contentKeyIDList: [
-            self.licenseUrl], playlistURL: self.licenseUrl)
+            self.licenseUrl], playlistURL: self.licenseUrl, accessToken: drmLicenseRequestHeaders?.value(forKey: Constants.DOWNLOAD_ACTION_FILE))
         let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
         var asset = Asset.init(stream: stream, urlAsset: urlAsset)
         return asset

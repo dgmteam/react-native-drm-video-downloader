@@ -9,10 +9,11 @@
 
 import AVFoundation
 
+@available(iOS 11.2, *)
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     // MARK: Types
-    let drmUrl : String = "https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=1e9b465a-6eeb-444b-81bf-746fa830936b"
+//    let drmUrl : String = "https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=1e9b465a-6eeb-444b-81bf-746fa830936b"
     enum ProgramError: Error {
         case missingApplicationCertificate
         case noCKCReturnedByKSM
@@ -86,11 +87,10 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         
         let semaphore = DispatchSemaphore(value: 0)
         let postString = "spc=\(spcData.base64EncodedString())&assetId=\(assetID)"
-        
+        let asset = AssetListManager.sharedManager.asset(at: <#T##Int#>)
         if let postData = postString.data(using: .ascii, allowLossyConversion: true), let drmServerUrl = URL(string: self.drmUrl) {
             var request = URLRequest(url: drmServerUrl)
-            request.httpMethod = "POST"
-            request.setValue("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiIxZTliNDY1YS02ZWViLTQ0NGItODFiZi03NDZmYTgzMDkzNmIiLCJuYmYiOjE2MDAzMzgzMTIsImV4cCI6MTYwMDM0MjIxMiwiaXNzIjoiaHR0cHM6Ly9ldmVybGVhcm4udm4iLCJhdWQiOiJ3ZWJhcHAifQ.dg0dF7YMW8C8bRqtwvpIJV44SEvawBcvEEETfVXjTBQ", forHTTPHeaderField: "Authorization")
+            request.httpMethod = "POST" request.setValue("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiIxZTliNDY1YS02ZWViLTQ0NGItODFiZi03NDZmYTgzMDkzNmIiLCJuYmYiOjE2MDAzMzgzMTIsImV4cCI6MTYwMDM0MjIxMiwiaXNzIjoiaHR0cHM6Ly9ldmVybGVhcm4udm4iLCJhdWQiOiJ3ZWJhcHAifQ.dg0dF7YMW8C8bRqtwvpIJV44SEvawBcvEEETfVXjTBQ", forHTTPHeaderField: "Authorization")
             request.setValue(String(postData.count), forHTTPHeaderField: "Content-Length")
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             request.httpBody = postData
@@ -135,9 +135,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             guard let contentKeyIdentifierURL = URL(string: identifier), let assetIDString = contentKeyIdentifierURL.host else { continue }
             
             pendingPersistableContentKeyIdentifiers.insert(assetIDString)
-            contentKeyToStreamNameMap[assetIDString] = asset.stream.name
-            
-            ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier, initializationData: nil, options: nil)
+            contentKeyToStreamNameMap[assetIDString] = asset.stream.name; ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier, initializationData: nil, options: nil)
         }
     }
     
@@ -177,7 +175,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
      -contentKeySession:contentKeyRequest:didFailWithError:.
      */
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
-                           reason retryReason: AVContentKeyRequestRetryReason) -> Bool {
+                           reason retryReason: AVContentKeyRequest.RetryReason) -> Bool {
         
         var shouldRetry = false
         
@@ -186,21 +184,21 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
              Indicates that the content key request should be retried because the key response was not set soon enough either
              due the initial request/response was taking too long, or a lease was expiring in the meantime.
              */
-        case AVContentKeyRequestRetryReason.timedOut:
+        case AVContentKeyRequest.RetryReason.timedOut:
             shouldRetry = true
             
             /*
              Indicates that the content key request should be retried because a key response with expired lease was set on the
              previous content key request.
              */
-        case AVContentKeyRequestRetryReason.receivedResponseWithExpiredLease:
+        case AVContentKeyRequest.RetryReason.receivedResponseWithExpiredLease:
             shouldRetry = true
             
             /*
              Indicates that the content key request should be retried because an obsolete key response was set on the previous
              content key request.
              */
-        case AVContentKeyRequestRetryReason.receivedObsoleteContentKey:
+        case AVContentKeyRequest.RetryReason.receivedObsoleteContentKey:
             shouldRetry = true
             
         default:

@@ -10,6 +10,7 @@
 import Foundation
 import AVFoundation
 
+@available(iOS 11.2, *)
 class AssetListManager: NSObject {
     
     // MARK: Properties
@@ -74,34 +75,53 @@ class AssetListManager: NSObject {
         return assets[index]
     }
     
+    func add(asset: Asset){
+        assets.append(asset)
+        StreamListManager.shared.add(newStream: asset.stream)
+    }
+    
+    // MARK: API.
+    
+    /// Returns a `Stream` value for a given name.
+    ///
+    /// - Parameter name: The name of the stream to lookup.
+    /// - Returns: The `Stream` value.
+//    func asset(withName name: String) -> Stream {
+//        guard let stream = streamMap[name] else {
+//            fatalError("Could not find `Stream` with name: \(name)")
+//        }
+//
+//        return stream
+//    }
+    
 #if os(iOS)
     @objc
     func handleAssetPersistenceManagerDidRestoreState(_ notification: Notification) {
         DispatchQueue.main.async {
             
             // Iterate over each dictionary in the array.
-            for stream in StreamListManager.shared.streams {
-                
-                // To ensure that we are reusing AVURLAssets we first find out if there is one available for an already active download.
-                if let asset = AssetPersistenceManager.sharedManager.assetForStream(withName: stream.name) {
-                    self.assets.append(asset)
-                } else {
-                    /*
-                     If an existing `AVURLAsset` is not available for an active
-                     download we then see if there is a file URL available to
-                     create an asset from.
-                     */
-                    if let asset = AssetPersistenceManager.sharedManager.localAssetForStream(withName: stream.name) {
-                        self.assets.append(asset)
-                    } else {
-                        let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
-                        
-                        let asset = Asset(stream: stream, urlAsset: urlAsset)
-                        
-                        self.assets.append(asset)
-                    }
-                }
-            }
+//            for stream in StreamListManager.shared.streams {
+//
+//                // To ensure that we are reusing AVURLAssets we first find out if there is one available for an already active download.
+//                if let asset = AssetPersistenceManager.sharedManager.assetForStream(withName: stream.name) {
+//                    self.assets.append(asset)
+//                } else {
+//                    /*
+//                     If an existing `AVURLAsset` is not available for an active
+//                     download we then see if there is a file URL available to
+//                     create an asset from.
+//                     */
+//                    if let asset = AssetPersistenceManager.sharedManager.localAssetForStream(withName: stream.name) {
+//                        self.assets.append(asset)
+//                    } else {
+//                        let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
+//
+//                        let asset = Asset(stream: stream, urlAsset: urlAsset)
+//
+//                        self.assets.append(asset)
+//                    }
+//                }
+//            }
             
             NotificationCenter.default.post(name: .AssetListManagerDidLoad,
                                             object: self)

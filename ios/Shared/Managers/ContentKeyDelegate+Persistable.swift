@@ -8,6 +8,7 @@
 
 import AVFoundation
 
+@available(iOS 11.2, *)
 extension ContentKeyDelegate {
     
     /*

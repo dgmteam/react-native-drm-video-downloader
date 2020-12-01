@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 
+@available(iOS 11.2, *)
 class AssetPlaybackManager: NSObject {
     
     // MARK: Properties
@@ -114,6 +115,7 @@ class AssetPlaybackManager: NSObject {
 }
 
 /// AssetPlaybackDelegate provides a common interface for AssetPlaybackManager to provide callbacks to its delegate.
+@available(iOS 11.2, *)
 protocol AssetPlaybackDelegate: AnyObject {
 
     /// This is called when the internal AVPlayer in AssetPlaybackManager is ready to start playback.

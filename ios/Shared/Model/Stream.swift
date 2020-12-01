@@ -33,13 +33,14 @@ class Stream {
     /// An array of content IDs to use for loading content keys with FPS.
     let contentKeyIDList: [String]?
     
-    let accessToken: String
+    let header: [String]?
     
-    init(name:String?, isProtected: Bool, contentKeyIDList:[String]?, playlistURL:String?) {
+    init(name:String, isProtected: Bool, contentKeyIDList:[String]?, playlistURL:String, header: [String]?) {
         self.name = name
         self.playlistURL = playlistURL
         self.isProtected = isProtected
         self.contentKeyIDList = contentKeyIDList
+        self.header = header
     }
 }
 
