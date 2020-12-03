@@ -56,17 +56,7 @@ class StreamListManager {
         
         return stream
     }
-    
-    private func  isExist(originStream: Stream?) -> Bool {
-        var ret = false
-        if let _originStream = originStream {
-            if let stream = stream(withName: _originStream.name){
-                ret = stream != nil
-            }
-        }
-        return ret
-    }
-    
+
     func add(newStream: Stream){
         streams.append(newStream)
         streamMap[newStream.name] = newStream

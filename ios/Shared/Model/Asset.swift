@@ -85,3 +85,15 @@ extension Asset {
         static let downloadSelectionDisplayName = "AssetDownloadSelectionDisplayNameKey"
     }
 }
+
+@available(iOS 11.2, *)
+extension Asset {
+    func toResult(action: String, progress: Float?, state: Asset.DownloadState?) -> NSDictionary {
+        let ret = NSDictionary.init()
+        ret.setValue(action, forKey: Constants.EVENT_DOWNLOAD_DRM_VIDEO_ACTION)
+        ret.setValue(self.stream.name, forKey: Constants.VIDEO_ID)
+        ret.setValue(self.stream.playlistURL, forKey: Constants.VIDEO_URL)
+        ret.setValue(Utils.getState(state: state ?? .notDownloaded), forKey: Constants.RESULT_PROGRESS)
+        return ret
+    }
+}

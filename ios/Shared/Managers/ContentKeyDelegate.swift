@@ -14,6 +14,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     // MARK: Types
 //    let drmUrl : String = "https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=1e9b465a-6eeb-444b-81bf-746fa830936b"
+    var currentAsset: Asset? = nil
     enum ProgramError: Error {
         case missingApplicationCertificate
         case noCKCReturnedByKSM
@@ -87,12 +88,20 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         
         let semaphore = DispatchSemaphore(value: 0)
         let postString = "spc=\(spcData.base64EncodedString())&assetId=\(assetID)"
-        let asset = AssetListManager.sharedManager.asset(at: <#T##Int#>)
-        if let postData = postString.data(using: .ascii, allowLossyConversion: true), let drmServerUrl = URL(string: self.drmUrl) {
+        let drmUrl = self.currentAsset?.stream.playlistURL ?? ""
+        if let postData = postString.data(using: .ascii, allowLossyConversion: true), let drmServerUrl = URL(string: drmUrl) {
             var request = URLRequest(url: drmServerUrl)
-            request.httpMethod = "POST" request.setValue("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiIxZTliNDY1YS02ZWViLTQ0NGItODFiZi03NDZmYTgzMDkzNmIiLCJuYmYiOjE2MDAzMzgzMTIsImV4cCI6MTYwMDM0MjIxMiwiaXNzIjoiaHR0cHM6Ly9ldmVybGVhcm4udm4iLCJhdWQiOiJ3ZWJhcHAifQ.dg0dF7YMW8C8bRqtwvpIJV44SEvawBcvEEETfVXjTBQ", forHTTPHeaderField: "Authorization")
+            request.httpMethod = "POST";
+            if let headers = self.currentAsset?.stream.header {
+                for keyItem in headers.allKeys {
+                    let key = keyItem as! String
+                    let value = headers.value(forKey: key) as? String
+                    request.setValue(value, forHTTPHeaderField: key)
+                }
+            }
             request.setValue(String(postData.count), forHTTPHeaderField: "Content-Length")
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            
             request.httpBody = postData
             
             URLSession.shared.dataTask(with: request) { (data, _, error) in
@@ -100,7 +109,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
                     responseString = responseString.replacingOccurrences(of: "<ckc>", with: "").replacingOccurrences(of: "</ckc>", with: "")
                     ckcData = Data(base64Encoded: responseString)
                 } else {
-                    print("Error encountered while fetching FairPlay license for URL: \(self.drmUrl), \(error?.localizedDescription ?? "Unknown error")")
+                    print("Error encountered while fetching FairPlay license for URL: \(drmUrl), \(error?.localizedDescription ?? "Unknown error")")
                 }
                 
                 semaphore.signal()
@@ -130,6 +139,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     ///
     /// - Parameter asset: The `Asset` to preload keys for.
     func requestPersistableContentKeys(forAsset asset: Asset) {
+        self.currentAsset = asset
         for identifier in asset.stream.contentKeyIDList ?? [] {
             
             guard let contentKeyIdentifierURL = URL(string: identifier), let assetIDString = contentKeyIdentifierURL.host else { continue }

@@ -33,9 +33,9 @@ class Stream {
     /// An array of content IDs to use for loading content keys with FPS.
     let contentKeyIDList: [String]?
     
-    let header: [String]?
+    let header: NSDictionary?
     
-    init(name:String, isProtected: Bool, contentKeyIDList:[String]?, playlistURL:String, header: [String]?) {
+    init(name:String, isProtected: Bool, contentKeyIDList:[String]?, playlistURL:String, header: NSDictionary?) {
         self.name = name
         self.playlistURL = playlistURL
         self.isProtected = isProtected

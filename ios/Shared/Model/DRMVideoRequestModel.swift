@@ -7,19 +7,20 @@
 //
 
 import Foundation
+import AVFoundation
 
 class DRMVideoRequestModel {
     var id: String?
     var url: String?
-    var licenseUrl: String?
+    var contentKeyIds: [String]
     var scheme: String?
     var title: String?
     var drmLicenseRequestHeaders: NSDictionary?
     
-    init(id: String?, url:String?, licenseUrl:String?,scheme:String?,title:String?,drmLicenseRequestHeaders:NSDictionary?) {
+    init(id: String?, url:String?, contentKeyIds:[String],scheme:String?,title:String?,drmLicenseRequestHeaders:NSDictionary?) {
         self.id = id
         self.url = url
-        self.licenseUrl = licenseUrl
+        self.contentKeyIds = contentKeyIds
         self.scheme = scheme
         self.drmLicenseRequestHeaders = drmLicenseRequestHeaders
     }
@@ -28,10 +29,9 @@ class DRMVideoRequestModel {
 @available(iOS 11.2, *)
 extension DRMVideoRequestModel {
     func toAsset() -> Asset? {
-        let stream = Stream.init(name: self.id?, isProtected: true, contentKeyIDList: [
-            self.licenseUrl], playlistURL: self.licenseUrl, accessToken: drmLicenseRequestHeaders?.value(forKey: Constants.DOWNLOAD_ACTION_FILE))
-        let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
-        var asset = Asset.init(stream: stream, urlAsset: urlAsset)
+        let stream = Stream.init(name: self.title ?? "", isProtected: true, contentKeyIDList: self.contentKeyIds, playlistURL: self.url ?? "", header: self.drmLicenseRequestHeaders)
+        let urlAsset = AVURLAsset.init(url: URL(string: stream.playlistURL)!)
+        let asset = Asset.init(stream: stream, urlAsset: urlAsset)
         return asset
     }
 }

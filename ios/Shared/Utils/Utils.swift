@@ -15,19 +15,40 @@ class Utils {
             let id = _params.value(forKey: Constants.VIDEO_ID) as? String
             let videoUrl = _params.value(forKey: Constants.VIDEO_URL) as? String
             let videoScheme = _params.value(forKey: Constants.VIDEO_SCHEME) as? String
-            let licenseUrl = _params.value(forKey: Constants.VIDEO_LICENSE_URL) as? String
+      //     let licenseUrl = _params.value(forKey: Constants.VIDEO_LICENSE_URL) as? String
+            let contentKeyIds = _params.value(forKey: Constants.VIDEO_CONTENT_KEY_IDS) as? [String]
             let videoTitle = _params.value(forKey: Constants.VIDEO_TITLE) as? String
             let videoLicenseRequestHeader = _params.value(forKey: Constants.VIDEO_LICENSE_REQUEST_HEADER) as? NSDictionary
-            ret = DRMVideoRequestModel(id: id ?? "" , url: videoUrl, licenseUrl: licenseUrl, scheme: videoScheme, title: videoTitle, drmLicenseRequestHeaders: videoLicenseRequestHeader);
+            ret = DRMVideoRequestModel.init(id: id ?? "" , url: videoUrl, contentKeyIds: contentKeyIds ?? [], scheme: videoScheme, title: videoTitle, drmLicenseRequestHeaders: videoLicenseRequestHeader)
         }
         return ret
     }
     
     static func isValidRequest(videoRequestModel: DRMVideoRequestModel?) -> Bool{
       var ret = true
-        if (videoRequestModel == nil || videoRequestModel?.url == nil || videoRequestModel?.url?.isEmpty ?? false || videoRequestModel?.licenseUrl == nil || videoRequestModel?.licenseUrl?.isEmpty ?? false){
+        if (videoRequestModel == nil || videoRequestModel?.url == nil || videoRequestModel?.url?.isEmpty ?? false || videoRequestModel?.contentKeyIds == nil || videoRequestModel?.contentKeyIds.isEmpty ?? false){
         ret = false
       }
       return ret
+    }
+    
+    @available(iOS 11.2, *)
+    static func getState(state: Asset.DownloadState) -> Int {
+        var ret = -1
+        switch state {
+        case .downloaded:
+            ret = 3
+            break
+        case .downloading:
+            ret = 2
+            break
+        case .notDownloaded:
+            ret = -1
+            break
+        default:
+            ret = -1
+            break
+        }
+        return ret
     }
 }

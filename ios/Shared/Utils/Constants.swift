@@ -17,6 +17,7 @@ class Constants {
     static let VIDEO_ID = "id"
     static let VIDEO_URL = "url"
     static let VIDEO_LICENSE_URL = "licenseUrl"
+    static let VIDEO_CONTENT_KEY_IDS = "contentKeyIds"
     static let VIDEO_SCHEME = "scheme"
     static let VIDEO_TITLE = "title"
     static let VIDEO_LICENSE_REQUEST_HEADER = "drmLicenseRequestHeaders"

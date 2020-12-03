@@ -38,20 +38,20 @@ export const useApp = () => {
     }
   }, [videoRequestModel]);
 
-  useEffect(() => {
-    var eventEmitter = new NativeEventEmitter(
-      NativeModules.DrmVideoDownloaderExample
-    );
-    var eventListenerSub = eventEmitter.addListener(
-      DRMVideoEventName,
-      (info?: DRMVideoInfo) => {
-        setVideoInfo(info);
-      }
-    );
-    return () => {
-      return eventListenerSub.remove();
-    };
-  }, []);
+  // useEffect(() => {
+  //   var eventEmitter = new NativeEventEmitter(
+  //     NativeModules.DrmVideoDownloaderExample
+  //   );
+  //   var eventListenerSub = eventEmitter.addListener(
+  //     DRMVideoEventName,
+  //     (info?: DRMVideoInfo) => {
+  //       setVideoInfo(info);
+  //     }
+  //   );
+  //   return () => {
+  //     return eventListenerSub.remove();
+  //   };
+  // }, []);
 
   const getVideoStatus = () => {
     // DrmVideoDownloader.getDownloadableStatus(videoRequestModel).then(
