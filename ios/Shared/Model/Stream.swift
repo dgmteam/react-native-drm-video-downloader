@@ -27,6 +27,8 @@ class Stream {
     /// The URL pointing to the HLS stream.
     let playlistURL: String
     
+    let licenseUrl: String
+    
     /// A Boolen value representing if the stream uses FPS.
     let isProtected: Bool
     
@@ -35,12 +37,13 @@ class Stream {
     
     let header: NSDictionary?
     
-    init(name:String, isProtected: Bool, contentKeyIDList:[String]?, playlistURL:String, header: NSDictionary?) {
+    init(name:String, isProtected: Bool, contentKeyIDList:[String]?, playlistURL:String,licenseUrl: String, header: NSDictionary?) {
         self.name = name
         self.playlistURL = playlistURL
         self.isProtected = isProtected
         self.contentKeyIDList = contentKeyIDList
         self.header = header
+        self.licenseUrl = licenseUrl
     }
 }
 

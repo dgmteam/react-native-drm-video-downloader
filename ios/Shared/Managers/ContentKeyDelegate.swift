@@ -58,7 +58,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         var applicationCertificate: Data? = nil
 
         do {
-            if let certUrl = Bundle.main.path(forResource: "fairplay_cert", ofType: "cer") {
+            if let certUrl = Bundle.main.path(forResource: "fairplay", ofType: "cer") {
                 applicationCertificate = try Data.init(contentsOf:  URL.init(fileURLWithPath: certUrl), options: .mappedIfSafe)
             }
         } catch {
@@ -88,7 +88,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         
         let semaphore = DispatchSemaphore(value: 0)
         let postString = "spc=\(spcData.base64EncodedString())&assetId=\(assetID)"
-        let drmUrl = self.currentAsset?.stream.playlistURL ?? ""
+        let drmUrl = self.currentAsset?.stream.licenseUrl ?? ""
         if let postData = postString.data(using: .ascii, allowLossyConversion: true), let drmServerUrl = URL(string: drmUrl) {
             var request = URLRequest(url: drmServerUrl)
             request.httpMethod = "POST";
@@ -104,7 +104,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             
             request.httpBody = postData
             
-            URLSession.shared.dataTask(with: request) { (data, _, error) in
+            URLSession.shared.dataTask(with: request) { (data, response , error) in
                 if let data = data, var responseString = String(data: data, encoding: .utf8) {
                     responseString = responseString.replacingOccurrences(of: "<ckc>", with: "").replacingOccurrences(of: "</ckc>", with: "")
                     ckcData = Data(base64Encoded: responseString)
@@ -145,7 +145,9 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             guard let contentKeyIdentifierURL = URL(string: identifier), let assetIDString = contentKeyIdentifierURL.host else { continue }
             
             pendingPersistableContentKeyIdentifiers.insert(assetIDString)
-            contentKeyToStreamNameMap[assetIDString] = asset.stream.name; ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier, initializationData: nil, options: nil)
+            contentKeyToStreamNameMap[assetIDString] = asset.stream.name;
+            ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier,
+                                                    initializationData: nil, options: nil)
         }
     }
     

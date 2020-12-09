@@ -22,6 +22,7 @@ class Constants {
     static let VIDEO_TITLE = "title"
     static let VIDEO_LICENSE_REQUEST_HEADER = "drmLicenseRequestHeaders"
     static let VIDEO_HEADER_AUTHORIZATION = "Authorization"
+    static let VIDEO_IS_PROTECTED = "isProtected"
 
     static let RESULT_PROGRESS = "progress"
     static let RESULT_STATE = "state"

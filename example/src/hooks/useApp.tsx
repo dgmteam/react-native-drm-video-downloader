@@ -18,17 +18,36 @@ export const useApp = () => {
   const [videoInfo, setVideoInfo] = useState<DRMVideoInfo | undefined>();
 
   useEffect(() => {
+    // for android
+    // setVideoRequestModel({
+    //   id: '495ac53d-831f-412b-98fe-5445bbecf5b1',
+    //   licenseUrl: 'https://proxy.uat.widevine.com/proxy?provider=widevine_test',
+    //   url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
+    //   scheme: 'widevine',
+    //   drmLicenseRequestHeaders: {
+    //     Authorization:
+    //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI0OTVhYzUzZC04MzFmLTQxMmItOThmZS01NDQ1YmJlY2Y1YjEiLCJuYmYiOjE2MDYyNzU0NzMsImV4cCI6MTYwNjI3OTM3MywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.B9dpaMMGK1Y-YR39KuOzCuZXpcFBDngTSxDEaYHB99Y',
+    //   },
+    //   title: 'Demo video',
+    // });
+
+    // for ios
     setVideoRequestModel({
-      id: '495ac53d-831f-412b-98fe-5445bbecf5b1',
-      licenseUrl: 'https://proxy.uat.widevine.com/proxy?provider=widevine_test',
-      url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
-      scheme: 'widevine',
-      drmLicenseRequestHeaders: {
-        Authorization:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI0OTVhYzUzZC04MzFmLTQxMmItOThmZS01NDQ1YmJlY2Y1YjEiLCJuYmYiOjE2MDYyNzU0NzMsImV4cCI6MTYwNjI3OTM3MywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.B9dpaMMGK1Y-YR39KuOzCuZXpcFBDngTSxDEaYHB99Y',
-      },
-      title: 'Demo video',
-    });
+            id: 'c80dd297-68de-46dd-b58c-9056f29ea16e',
+            licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=c80dd297-68de-46dd-b58c-9056f29ea16e',
+            url: 'https://mvvuni-aase.streaming.media.azure.net/c6253401-0928-43ab-adc7-ea4aad27bb34/Big_Buck_Bunny_1080_10s_1MB.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
+           // url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
+            scheme: 'widevine',
+            drmLicenseRequestHeaders: {
+              Authorization:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiJjODBkZDI5Ny02OGRlLTQ2ZGQtYjU4Yy05MDU2ZjI5ZWExNmUiLCJuYmYiOjE2MDc0OTc4ODUsImV4cCI6MTYwNzUwMTc4NSwiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.5GGsj8pEgATuuVKmdiMU7BCS-865a8WOluPsiD30wuw',
+            },
+            contentKeyIds: [
+              'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=c80dd297-68de-46dd-b58c-9056f29ea16e'
+            ],
+            title: 'Demo video',
+            isProtected: true
+    })
   }, []);
 
   useEffect(() => {

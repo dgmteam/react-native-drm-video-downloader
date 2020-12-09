@@ -41,6 +41,7 @@ class StreamListManager {
 //        } catch {
 //            fatalError("An error occured when reading the Streams.plist file: \(error.localizedDescription)")
 //        }
+        streams = []
     }
     
     // MARK: API.

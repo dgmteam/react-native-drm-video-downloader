@@ -14,12 +14,13 @@ class Utils {
         if let _params = params {
             let id = _params.value(forKey: Constants.VIDEO_ID) as? String
             let videoUrl = _params.value(forKey: Constants.VIDEO_URL) as? String
+            let isProtected = _params.value(forKey: Constants.VIDEO_IS_PROTECTED) as? Bool
             let videoScheme = _params.value(forKey: Constants.VIDEO_SCHEME) as? String
-      //     let licenseUrl = _params.value(forKey: Constants.VIDEO_LICENSE_URL) as? String
+            let licenseUrl = _params.value(forKey: Constants.VIDEO_LICENSE_URL) as? String
             let contentKeyIds = _params.value(forKey: Constants.VIDEO_CONTENT_KEY_IDS) as? [String]
             let videoTitle = _params.value(forKey: Constants.VIDEO_TITLE) as? String
             let videoLicenseRequestHeader = _params.value(forKey: Constants.VIDEO_LICENSE_REQUEST_HEADER) as? NSDictionary
-            ret = DRMVideoRequestModel.init(id: id ?? "" , url: videoUrl, contentKeyIds: contentKeyIds ?? [], scheme: videoScheme, title: videoTitle, drmLicenseRequestHeaders: videoLicenseRequestHeader)
+            ret = DRMVideoRequestModel.init(id: id ?? "" , url: videoUrl, contentKeyIds: contentKeyIds ?? [], scheme: videoScheme, title: videoTitle,licenseUrl: licenseUrl ?? "" , drmLicenseRequestHeaders: videoLicenseRequestHeader, isProtected: isProtected)
         }
         return ret
     }

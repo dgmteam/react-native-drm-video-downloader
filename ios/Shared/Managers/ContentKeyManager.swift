@@ -29,7 +29,7 @@ class ContentKeyManager {
     let contentKeyDelegate: ContentKeyDelegate
     
     /// The DispatchQueue to use for delegate callbacks.
-    let contentKeyDelegateQueue = DispatchQueue(label: "com.example.apple-samplecode.HLSCatalog.ContentKeyDelegateQueue")
+    let contentKeyDelegateQueue = DispatchQueue(label: "org.reactjs.native.DrmVideoDownloaderExample.DrmVideoDownloaderExample")
     
     // MARK: Initialization.
     

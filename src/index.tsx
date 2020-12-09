@@ -7,6 +7,7 @@ export interface DRMVideoRequestModel {
   scheme?: string;
   title?: string;
   drmLicenseRequestHeaders?: object;
+  isProtected?: boolean
 }
 
 export const DRMVideoEventName = 'DownloadDrmVideo'
@@ -38,7 +39,7 @@ export interface DRMVideoInfo{
   url?: string
   state?: number,
   progress?: number
-  action: string
+  action: string,
 }
 
 type DrmVideoDownloaderType = {

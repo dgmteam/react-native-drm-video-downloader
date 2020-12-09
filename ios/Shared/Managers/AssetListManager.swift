@@ -80,6 +80,16 @@ class AssetListManager: NSObject {
         StreamListManager.shared.add(newStream: asset.stream)
     }
     
+    func with(streamName:String?) -> Asset? {
+        var ret: Asset? = nil
+        assets.forEach { (asset) in
+            if (asset.stream.name == streamName){
+                ret = asset
+            }
+        }
+        return ret
+    }
+    
     // MARK: API.
     
     /// Returns a `Stream` value for a given name.
@@ -100,28 +110,28 @@ class AssetListManager: NSObject {
         DispatchQueue.main.async {
             
             // Iterate over each dictionary in the array.
-//            for stream in StreamListManager.shared.streams {
-//
-//                // To ensure that we are reusing AVURLAssets we first find out if there is one available for an already active download.
-//                if let asset = AssetPersistenceManager.sharedManager.assetForStream(withName: stream.name) {
-//                    self.assets.append(asset)
-//                } else {
-//                    /*
-//                     If an existing `AVURLAsset` is not available for an active
-//                     download we then see if there is a file URL available to
-//                     create an asset from.
-//                     */
-//                    if let asset = AssetPersistenceManager.sharedManager.localAssetForStream(withName: stream.name) {
-//                        self.assets.append(asset)
-//                    } else {
-//                        let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
-//
-//                        let asset = Asset(stream: stream, urlAsset: urlAsset)
-//
-//                        self.assets.append(asset)
-//                    }
-//                }
-//            }
+            for stream in StreamListManager.shared.streams {
+
+                // To ensure that we are reusing AVURLAssets we first find out if there is one available for an already active download.
+                if let asset = AssetPersistenceManager.sharedManager.assetForStream(withName: stream.name) {
+                    self.assets.append(asset)
+                } else {
+                    /*
+                     If an existing `AVURLAsset` is not available for an active
+                     download we then see if there is a file URL available to
+                     create an asset from.
+                     */
+                    if let asset = AssetPersistenceManager.sharedManager.localAssetForStream(withName: stream.name) {
+                        self.assets.append(asset)
+                    } else {
+                        let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
+
+                        let asset = Asset(stream: stream, urlAsset: urlAsset)
+
+                        self.assets.append(asset)
+                    }
+                }
+            }
             
             NotificationCenter.default.post(name: .AssetListManagerDidLoad,
                                             object: self)
@@ -129,7 +139,6 @@ class AssetListManager: NSObject {
     }
 #endif
 }
-
 extension Notification.Name {
     
     /// Notification for when download progress has changed.

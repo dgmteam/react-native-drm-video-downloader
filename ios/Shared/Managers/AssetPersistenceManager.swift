@@ -30,6 +30,7 @@ class AssetPersistenceManager: NSObject {
     /// Internal map of AVAggregateAssetDownloadTask to download URL.
     fileprivate var willDownloadToUrlMap = [AVAggregateAssetDownloadTask: URL]()
     
+    fileprivate var shouldUpdateProgressChanged = false
     // MARK: Intialization
     
     override private init() {
@@ -43,6 +44,10 @@ class AssetPersistenceManager: NSObject {
         assetDownloadURLSession =
             AVAssetDownloadURLSession(configuration: backgroundConfiguration,
                                       assetDownloadDelegate: self, delegateQueue: OperationQueue.main)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleContentKeyDelegateDidSaveAllPersistableContentKey(notification:)),
+                                               name: .DidSaveAllPersistableContentKey,
+                                               object: nil)
     }
     
     /// Restores the Application state by getting all the AVAssetDownloadTasks and restoring their Asset structs.
@@ -65,8 +70,9 @@ class AssetPersistenceManager: NSObject {
                 
                 self.activeDownloadsMap[assetDownloadTask] = asset
             }
-            
-            NotificationCenter.default.post(name: .AssetPersistenceManagerDidRestoreState, object: nil)
+            if (self.shouldUpdateProgressChanged){
+                NotificationCenter.default.post(name: .AssetPersistenceManagerDidRestoreState, object: nil)
+            }
         }
     }
     
@@ -88,9 +94,8 @@ class AssetPersistenceManager: NSObject {
                                                                mediaSelections: [preferredMediaSelection],
                                                                assetTitle: asset.stream.name,
                                                                assetArtworkData: nil,
-                                                               options:nil
-//                [AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: 265_000]
-            ) else { return }
+                                                               options:
+                [AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: 265_000]) else { return }
         
         // To better track the AVAssetDownloadTask we set the taskDescription to something unique for our sample.
         task.taskDescription = asset.stream.name
@@ -104,7 +109,9 @@ class AssetPersistenceManager: NSObject {
         userInfo[Asset.Keys.downloadState] = Asset.DownloadState.downloading.rawValue
         userInfo[Asset.Keys.downloadSelectionDisplayName] = displayNamesForSelectedMediaOptions(preferredMediaSelection)
         
-        NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        if (shouldUpdateProgressChanged){
+            NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        }
     }
     
     /// Returns an Asset given a specific name if that Asset is associated with an active download.
@@ -176,9 +183,10 @@ class AssetPersistenceManager: NSObject {
                 var userInfo = [String: Any]()
                 userInfo[Asset.Keys.name] = asset.stream.name
                 userInfo[Asset.Keys.downloadState] = Asset.DownloadState.notDownloaded.rawValue
-                
-                NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil,
-                                                userInfo: userInfo)
+                if (shouldUpdateProgressChanged){
+                    NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil,
+                                                    userInfo: userInfo)
+                }
             }
         } catch {
             print("An error occured deleting the file: \(error)")
@@ -289,8 +297,9 @@ extension AssetPersistenceManager: AVAssetDownloadDelegate {
             userInfo[Asset.Keys.downloadState] = Asset.DownloadState.downloaded.rawValue
             userInfo[Asset.Keys.downloadSelectionDisplayName] = ""
         }
-        
-        NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        if (shouldUpdateProgressChanged){
+            NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        }
     }
     
     /// Method called when the an aggregate download task determines the location this asset will be downloaded to.
@@ -327,8 +336,9 @@ extension AssetPersistenceManager: AVAssetDownloadDelegate {
         
         userInfo[Asset.Keys.downloadState] = Asset.DownloadState.downloading.rawValue
         userInfo[Asset.Keys.downloadSelectionDisplayName] = displayNamesForSelectedMediaOptions(mediaSelection)
-        
-        NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        if (shouldUpdateProgressChanged){
+            NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        }
     }
     
     /// Method to adopt to subscribe to progress updates of an AVAggregateAssetDownloadTask.
@@ -349,8 +359,32 @@ extension AssetPersistenceManager: AVAssetDownloadDelegate {
         var userInfo = [String: Any]()
         userInfo[Asset.Keys.name] = asset.stream.name
         userInfo[Asset.Keys.percentDownloaded] = percentComplete
+        if (shouldUpdateProgressChanged){
+            NotificationCenter.default.post(name: .AssetDownloadProgress, object: nil, userInfo: userInfo)
+        }
+    }
+}
+@available(iOS 11.2, *)
+extension AssetPersistenceManager {
+    func enableTrackingEvent() {
+        self.shouldUpdateProgressChanged = true
+    }
+    
+    func disableTrackingEvent() {
+        self.shouldUpdateProgressChanged = false
+    }
+}
+
+@available(iOS 11.2, *)
+extension AssetPersistenceManager {
+    @objc
+    func handleContentKeyDelegateDidSaveAllPersistableContentKey(notification: Notification) {
+        guard let assetName = notification.userInfo?["name"] as? String,
+              let asset = AssetListManager.sharedManager.with(streamName: assetName) else {
+            return
+        }
         
-        NotificationCenter.default.post(name: .AssetDownloadProgress, object: nil, userInfo: userInfo)
+        AssetPersistenceManager.sharedManager.downloadStream(for: asset)
     }
 }
 
