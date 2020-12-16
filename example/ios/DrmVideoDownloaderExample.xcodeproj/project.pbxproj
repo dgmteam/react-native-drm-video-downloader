@@ -145,7 +145,7 @@
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = S9S9X73LHT;
+						DevelopmentTeam = BN43X6CN2M;
 						LastSwiftMigration = 1110;
 					};
 				};
@@ -274,7 +274,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = S9S9X73LHT;
+				DEVELOPMENT_TEAM = BN43X6CN2M;
 				INFOPLIST_FILE = DrmVideoDownloaderExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
@@ -290,7 +290,7 @@
 				PRODUCT_NAME = DrmVideoDownloaderExample;
 				SWIFT_OBJC_BRIDGING_HEADER = "DrmVideoDownloaderExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -302,7 +302,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = S9S9X73LHT;
+				DEVELOPMENT_TEAM = BN43X6CN2M;
 				INFOPLIST_FILE = DrmVideoDownloaderExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
@@ -317,7 +317,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.DrmVideoDownloaderExample.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = DrmVideoDownloaderExample;
 				SWIFT_OBJC_BRIDGING_HEADER = "DrmVideoDownloaderExample-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 4.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

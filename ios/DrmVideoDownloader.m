@@ -14,8 +14,6 @@ RCT_EXTERN_METHOD(download:(NSDictionary)params
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(restorePersistenceManager)
-
 RCT_EXTERN_METHOD(getDownloadableInfo:(NSDictionary)params
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)

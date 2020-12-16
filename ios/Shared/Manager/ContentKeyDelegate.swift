@@ -9,11 +9,9 @@
 
 import AVFoundation
 
-@available(iOS 11.2, *)
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     // MARK: Types
-//    let drmUrl : String = "https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=1e9b465a-6eeb-444b-81bf-746fa830936b"
     var currentAsset: Asset? = nil
     enum ProgramError: Error {
         case missingApplicationCertificate
@@ -51,8 +49,17 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     /// A dictionary mapping content key identifiers to their associated stream name.
     var contentKeyToStreamNameMap = [String: String]()
-    // mark TODO
+    
     func requestApplicationCertificate() throws -> Data {
+        
+//        // MARK: ADAPT - You must implement this method to retrieve your FPS application certificate.
+//        let applicationCertificate: Data? = nil
+//
+//        guard applicationCertificate != nil else {
+//            throw ProgramError.missingApplicationCertificate
+//        }
+//
+//        return applicationCertificate!
         
         // MARK: ADAPT - You must implement this method to retrieve your FPS application certificate.
         var applicationCertificate: Data? = nil
@@ -61,6 +68,8 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             if let certUrl = Bundle.main.path(forResource: "fairplay", ofType: "cer") {
                 applicationCertificate = try Data.init(contentsOf:  URL.init(fileURLWithPath: certUrl), options: .mappedIfSafe)
             }
+            
+//            applicationCertificate = AssetPersistenceManager.sharedManager.delegate?.contentCertificate()
         } catch {
             print("Cannot loading FairPlay application certificate. Detail are :\(error)")
         }
@@ -71,11 +80,11 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         
         return applicationCertificate!
     }
-    // mark TODO
+    
     func requestContentKeyFromKeySecurityModule(spcData: Data, assetID: String) throws -> Data {
         
-        // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
-        
+//        // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
+//
 //        let ckcData: Data? = nil
 //
 //        guard ckcData != nil else {
@@ -85,13 +94,15 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
 //        return ckcData!
         
         var ckcData: Data? = nil
-        
+        let drmUrl = currentAsset?.stream.licenseUrl ?? ""
         let semaphore = DispatchSemaphore(value: 0)
         let postString = "spc=\(spcData.base64EncodedString())&assetId=\(assetID)"
-        let drmUrl = self.currentAsset?.stream.licenseUrl ?? ""
+        
         if let postData = postString.data(using: .ascii, allowLossyConversion: true), let drmServerUrl = URL(string: drmUrl) {
             var request = URLRequest(url: drmServerUrl)
-            request.httpMethod = "POST";
+            request.httpMethod = "POST"
+            request.setValue(String(postData.count), forHTTPHeaderField: "Content-Length")
+            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             if let headers = self.currentAsset?.stream.header {
                 for keyItem in headers.allKeys {
                     let key = keyItem as! String
@@ -99,26 +110,28 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
                     request.setValue(value, forHTTPHeaderField: key)
                 }
             }
-            request.setValue(String(postData.count), forHTTPHeaderField: "Content-Length")
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            
             request.httpBody = postData
             
-            URLSession.shared.dataTask(with: request) { (data, response , error) in
-                if let data = data, var responseString = String(data: data, encoding: .utf8) {
+            URLSession.shared.dataTask(with: request) { (data, response, error) in
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+                    print("The access token was expired.")
+                }else if let data = data, var responseString = String(data: data, encoding: .utf8) {
                     responseString = responseString.replacingOccurrences(of: "<ckc>", with: "").replacingOccurrences(of: "</ckc>", with: "")
+                    print("the ckc content is \(responseString)")
                     ckcData = Data(base64Encoded: responseString)
-                } else {
-                    print("Error encountered while fetching FairPlay license for URL: \(drmUrl), \(error?.localizedDescription ?? "Unknown error")")
-                }
-                
+                    } else {
+                        print("Error encountered while fetching FairPlay license for URL: \(drmUrl), \(error?.localizedDescription ?? "Unknown error")")
+                    }
                 semaphore.signal()
-                }.resume()
+            }.resume()
         } else {
             fatalError("Invalid post data")
         }
         
         semaphore.wait()
+        guard ckcData != nil else {
+            throw ProgramError.noCKCReturnedByKSM
+        }
         return ckcData!
     }
 
@@ -142,12 +155,11 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         self.currentAsset = asset
         for identifier in asset.stream.contentKeyIDList ?? [] {
             
-            guard let contentKeyIdentifierURL = URL(string: identifier), let assetIDString = contentKeyIdentifierURL.host else { continue }
-            
+            guard let contentKeyIdentifierURL = URL(string: identifier) else { continue }
+            guard let assetIDString = contentKeyIdentifierURL.queryParameters?["kid"] ?? contentKeyIdentifierURL.host else { continue }
             pendingPersistableContentKeyIdentifiers.insert(assetIDString)
-            contentKeyToStreamNameMap[assetIDString] = asset.stream.name;
-            ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier,
-                                                    initializationData: nil, options: nil)
+            contentKeyToStreamNameMap[assetIDString] = asset.stream.name
+            ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier, initializationData: nil, options: nil)
         }
     }
     
@@ -187,7 +199,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
      -contentKeySession:contentKeyRequest:didFailWithError:.
      */
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
-                           reason retryReason: AVContentKeyRequest.RetryReason) -> Bool {
+                           reason retryReason: AVContentKeyRequestRetryReason) -> Bool {
         
         var shouldRetry = false
         
@@ -196,21 +208,21 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
              Indicates that the content key request should be retried because the key response was not set soon enough either
              due the initial request/response was taking too long, or a lease was expiring in the meantime.
              */
-        case AVContentKeyRequest.RetryReason.timedOut:
+        case AVContentKeyRequestRetryReason.timedOut:
             shouldRetry = true
             
             /*
              Indicates that the content key request should be retried because a key response with expired lease was set on the
              previous content key request.
              */
-        case AVContentKeyRequest.RetryReason.receivedResponseWithExpiredLease:
+        case AVContentKeyRequestRetryReason.receivedResponseWithExpiredLease:
             shouldRetry = true
             
             /*
              Indicates that the content key request should be retried because an obsolete key response was set on the previous
              content key request.
              */
-        case AVContentKeyRequest.RetryReason.receivedObsoleteContentKey:
+        case AVContentKeyRequestRetryReason.receivedObsoleteContentKey:
             shouldRetry = true
             
         default:
@@ -230,7 +242,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
         guard let contentKeyIdentifierString = keyRequest.identifier as? String,
             let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = contentKeyIdentifierURL.host,
+            let assetIDString = contentKeyIdentifierURL.queryParameters?["kid"] ?? contentKeyIdentifierURL.host,
             let assetIDData = assetIDString.data(using: .utf8)
             else {
                 print("Failed to retrieve the assetID from the keyRequest!")
@@ -308,5 +320,16 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         #endif
         
         provideOnlinekey()
+    }
+}
+
+extension URL {
+    public var queryParameters: [String: String]? {
+        guard
+            let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
+            let queryItems = components.queryItems else { return nil }
+        return queryItems.reduce(into: [String: String]()) { (result, item) in
+            result[item.name] = item.value
+        }
     }
 }

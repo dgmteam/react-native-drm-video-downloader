@@ -1,21 +1,33 @@
-@available(iOS 11.2, *)
 @objc(DrmVideoDownloader)
 class DrmVideoDownloader: NSObject {
-
-//    @objc(multiply:withB:withResolver:withRejecter:)
-//    func multiply(a: Float, b: Float, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-//        resolve(a*b)
-//    }
+    @objc
+    static func restorePersistenceManager() {
+        print("restorePersistenceManager")
+        AssetPersistenceManager.sharedManager.restorePersistenceManager()
+    }
     
+    @objc
+    static func setDelegate(delegate: String?) {
+        print("setDelegate")
+//        AssetPersistenceManager.sharedManager.delegate = delegate
+    }
+
+    @objc(multiply:withB:withResolver:withRejecter:)
+    func multiply(a: Float, b: Float, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+        resolve(a*b)
+    }
     @objc(isDownloaded:withResolver:withRejecter:)
-    func isDownloaded(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+    func isDownloaded(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Bool {
+        var ret = false
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
+            ret = state == .downloaded
             resolve(state == .downloaded ? 1: 0)
         } else {
             reject("1000", "The request is invalid", nil)
         }
+        return ret
     }
     
     @objc(download:withResolver:withRejecter:)
@@ -24,6 +36,7 @@ class DrmVideoDownloader: NSObject {
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             AssetListManager.sharedManager.add(asset: asset)
             if videoRequestModel?.isProtected ?? false{
+                self.registerTrackingEvent()
                 ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAsset: asset)
             } else {
                 AssetPersistenceManager.sharedManager.downloadStream(for: asset)
@@ -48,30 +61,44 @@ class DrmVideoDownloader: NSObject {
     
     @objc(getDownloadableStatus:withResolver:withRejecter:)
     func getDownloadableStatus(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+//    func getDownloadableStatus(params: NSDictionary) -> Asset.DownloadState {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
+//            return state
             resolve(Utils.getState(state: state))
         } else {
             reject("1000", "The request is invalid", nil)
         }
+//        return .notDownloaded
     }
     
     @objc(removeDownload:withResolver:withRejecter:)
     func removeDownload(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
+//    func removeDownload(params: NSDictionary){
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             AssetPersistenceManager.sharedManager.cancelDownload(for: asset)
+            resolve(true)
         } else {
             reject("1000", "The request is invalid", nil)
         }
     }
     
-    
-    @objc
-    func restorePersistenceManager(){
-        AssetPersistenceManager.sharedManager.restorePersistenceManager()
-    }
+//    func delete(params: NSDictionary) {
+//        let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
+//        if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
+//            AssetPersistenceManager.sharedManager.deleteAsset(asset)
+//            ContentKeyManager.shared.contentKeyDelegate.deleteAllPeristableContentKeys(forAsset: asset)
+//        } else {
+//            reject("1000", "The request is invalid", nil)
+//        }
+//    }
+//    @objc
+//    func restorePersistenceManager(){
+//        print("restorePersistenceManager")
+//        AssetPersistenceManager.sharedManager.restorePersistenceManager()
+//    }
     
     @objc
     func registerTrackingEvent(){
@@ -91,7 +118,6 @@ class DrmVideoDownloader: NSObject {
     }
 }
 
-@available(iOS 11.2, *)
 extension DrmVideoDownloader {
     func registerEventWithNotificationCenter(){
         let notificationCenter = NotificationCenter.default
@@ -112,10 +138,13 @@ extension DrmVideoDownloader {
     }
 }
 
-@available(iOS 11.2, *)
 extension DrmVideoDownloader {
     @objc
     func handleAssetDownloadStateChanged(_ notification: Notification){
+        guard let assetStreamName = notification.userInfo![Asset.Keys.name] as? String,
+            let downloadStateRawValue = notification.userInfo![Asset.Keys.downloadState] as? String,
+            let downloadState = Asset.DownloadState(rawValue: downloadStateRawValue),
+            let asset = AssetListManager.sharedManager.with(streamName: assetStreamName) else { return }
         print("handleAssetDownloadStateChanged")
     }
     
@@ -124,14 +153,7 @@ extension DrmVideoDownloader {
         print("handleAssetDownloadProgress")
         guard let assetStreamName = notification.userInfo![Asset.Keys.name] as? String, let asset = AssetListManager.sharedManager.with(streamName: assetStreamName) else { return }
         guard let progress = notification.userInfo![Asset.Keys.percentDownloaded] as? Double else { return }
-        
+        print("progress percent \(progress)")
        // self.downloadProgressView.setProgress(Float(progress), animated: true)    }
     }
 }
-
-//@available(iOS 11.2, *)
-//extension DrmVideoDownloader {
-//    func notifyDataChanged() {
-//
-//    }
-//}

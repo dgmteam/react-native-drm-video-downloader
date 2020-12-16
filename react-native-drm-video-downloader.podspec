@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => "9.0" }
+  s.platforms    = { :ios => "11.3" }
   s.source       = { :git => "https://github.com/dgmteam/react-native-drm-video-downloader.git", :tag => "#{s.version}" }
 
   

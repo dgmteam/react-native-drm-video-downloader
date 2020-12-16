@@ -31,12 +31,38 @@ class DRMVideoRequestModel {
     }
 }
 
-@available(iOS 11.2, *)
 extension DRMVideoRequestModel {
     func toAsset() -> Asset? {
         let stream = Stream.init(name: self.title ?? "", isProtected: true, contentKeyIDList: self.contentKeyIds, playlistURL: self.url ?? "",licenseUrl: self.licenseUrl ,header: self.drmLicenseRequestHeaders)
-        let urlAsset = AVURLAsset(url: URL(string: stream.playlistURL)!)
-        let asset = Asset.init(stream: stream, urlAsset: urlAsset)
+        let localAssetUrl = self.getLocalAssetUrl(stream: stream)
+        let asset = Asset.init(stream: stream, urlAsset: localAssetUrl ?? AVURLAsset(url: URL(string: stream.playlistURL)!) )
         return asset
     }
+    
+    
+    func getLocalAssetUrl(stream: Stream) -> AVURLAsset? {
+        let userDefaults = UserDefaults.standard
+        guard let localFileLocation = userDefaults.value(forKey: stream.name) as? Data else { return nil }
+        var bookmarkDataIsStale = false
+        do {
+            guard let url = try URL(resolvingBookmarkData: localFileLocation,
+                                    bookmarkDataIsStale: &bookmarkDataIsStale) else {
+                                        fatalError("Failed to create URL from bookmark!")
+            }
+            
+            if bookmarkDataIsStale {
+                fatalError("Bookmark data is stale!")
+            }
+            
+            let urlAsset = AVURLAsset(url: url)
+            return urlAsset
+        } catch {
+            fatalError("Failed to create URL from bookmark with error: \(error)")
+        }
+        return nil
+    }
+}
+
+extension DRMVideoRequestModel {
+    
 }

@@ -6,7 +6,7 @@
  A simple class that holds information about an Asset.
  */
 import AVFoundation
-@available(iOS 11.2, *)
+
 class Asset {
     
     /// The AVURLAsset corresponding to this Asset.
@@ -15,15 +15,16 @@ class Asset {
     /// The underlying `Stream` associated with the Asset based on the contents of the `Streams.plist` entry.
     let stream: Stream
     
-    
     init(stream: Stream, urlAsset: AVURLAsset) {
-        self.urlAsset = urlAsset
         self.stream = stream
+        self.urlAsset = urlAsset
+        if self.stream.isProtected {
+            ContentKeyManager.shared.contentKeySession.addContentKeyRecipient(self.urlAsset)
+        }
     }
 }
 
 /// Extends `Asset` to conform to the `Equatable` protocol.
-@available(iOS 11.2, *)
 extension Asset: Equatable {
     static func ==(lhs: Asset, rhs: Asset) -> Bool {
         return (lhs.stream == rhs.stream) && (lhs.urlAsset == rhs.urlAsset)
@@ -34,7 +35,6 @@ extension Asset: Equatable {
  Extends `Asset` to add a simple download state enumeration used by the sample
  to track the download states of Assets.
  */
-@available(iOS 11.2, *)
 extension Asset {
     enum DownloadState: String {
         
@@ -52,7 +52,6 @@ extension Asset {
 /**
  Extends `Asset` to define a number of values to use as keys in dictionary lookups.
  */
-@available(iOS 11.2, *)
 extension Asset {
     struct Keys {
         /**
@@ -82,7 +81,6 @@ extension Asset {
     }
 }
 
-@available(iOS 11.2, *)
 extension Asset {
     func toResult(action: String, progress: Float?, state: Asset.DownloadState?) -> NSDictionary {
         let ret = NSMutableDictionary.init()

@@ -9,7 +9,6 @@
 
 import AVFoundation
 
-@available(iOS 11.2, *)
 class ContentKeyManager {
     
     // MARK: Types.
@@ -29,7 +28,7 @@ class ContentKeyManager {
     let contentKeyDelegate: ContentKeyDelegate
     
     /// The DispatchQueue to use for delegate callbacks.
-    let contentKeyDelegateQueue = DispatchQueue(label: "org.reactjs.native.DrmVideoDownloaderExample.DrmVideoDownloaderExample")
+    let contentKeyDelegateQueue = DispatchQueue(label: "com.example.apple-samplecode.HLSCatalog-With-FPS9YZXDAC47po")
     
     // MARK: Initialization.
     

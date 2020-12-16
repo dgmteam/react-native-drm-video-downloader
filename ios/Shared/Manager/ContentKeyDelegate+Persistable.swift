@@ -8,7 +8,6 @@
 
 import AVFoundation
 
-@available(iOS 11.2, *)
 extension ContentKeyDelegate {
     
     /*
@@ -50,7 +49,7 @@ extension ContentKeyDelegate {
          */
         guard let contentKeyIdentifierString = keyIdentifier as? String,
             let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = contentKeyIdentifierURL.host
+            let assetIDString = contentKeyIdentifierURL.queryParameters?["kid"] ?? contentKeyIdentifierURL.host
             else {
                 print("Failed to retrieve the assetID from the keyRequest!")
                 return
@@ -80,7 +79,7 @@ extension ContentKeyDelegate {
          */
         guard let contentKeyIdentifierString = keyRequest.identifier as? String,
             let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = contentKeyIdentifierURL.host,
+            let assetIDString = contentKeyIdentifierURL.queryParameters?["kid"] ?? contentKeyIdentifierURL.host,
             let assetIDData = assetIDString.data(using: .utf8)
             else {
                 print("Failed to retrieve the assetID from the keyRequest!")
@@ -186,7 +185,11 @@ extension ContentKeyDelegate {
     /// - Parameter asset: The `Asset` value to remove keys for.
     func deleteAllPeristableContentKeys(forAsset asset: Asset) {
         for contentKeyIdentifier in asset.stream.contentKeyIDList ?? [] {
-            deletePeristableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
+            let items = contentKeyIdentifier.components(separatedBy: "kid=")
+            if (items.count >= 2){
+                deletePeristableContentKey(withContentKeyIdentifier: items[1])
+            }
+            
         }
     }
     
@@ -215,7 +218,8 @@ extension ContentKeyDelegate {
     func persistableContentKeyExistsOnDisk(withContentKeyIdentifier contentKeyIdentifier: String) -> Bool {
         let contentKeyURL = urlForPersistableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
         
-        return FileManager.default.fileExists(atPath: contentKeyURL.path)
+        let ret =  FileManager.default.fileExists(atPath: contentKeyURL.path)
+        return ret
     }
     
     // MARK: Private APIs
