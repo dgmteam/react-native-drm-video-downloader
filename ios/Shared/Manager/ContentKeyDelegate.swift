@@ -234,8 +234,12 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     // Informs the receiver a content key request has failed.
     func contentKeySession(_ session: AVContentKeySession, contentKeyRequest keyRequest: AVContentKeyRequest, didFailWithError err: Error) {
-        // Add your code here to handle errors.
+        // Add your code here to handle errors.  
+        var userInfo = [String: Any]()
+        userInfo[Asset.Keys.identifier] = keyRequest.identifier 
+        NotificationCenter.default.post(name: .AssetDownloadFail, object: nil, userInfo: userInfo)
     }
+
     
     // MARK: API
     

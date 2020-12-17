@@ -28,14 +28,13 @@ class ContentKeyManager {
     let contentKeyDelegate: ContentKeyDelegate
     
     /// The DispatchQueue to use for delegate callbacks.
-    let contentKeyDelegateQueue = DispatchQueue(label: "com.example.apple-samplecode.HLSCatalog-With-FPS9YZXDAC47po")
+    let contentKeyDelegateQueue = DispatchQueue(label: "com.digimed.drmvideodownloader")
     
     // MARK: Initialization.
     
     private init() {
         contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming)
         contentKeyDelegate = ContentKeyDelegate()
-        
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
 }

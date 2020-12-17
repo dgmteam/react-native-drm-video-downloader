@@ -89,6 +89,20 @@ class AssetListManager: NSObject {
         return ret
     }
     
+    func with(identifier:String?) -> Asset? {
+        var ret: Asset? = nil
+        if let _identifier = identifier {
+            assets.forEach { (asset) in
+                asset.stream.contentKeyIDList?.forEach { (item) in
+                    if (item == _identifier){
+                        ret = asset
+                    }
+                }
+            }
+        }
+        return ret
+    }
+    
 #if os(iOS)
     @objc
     func handleAssetPersistenceManagerDidRestoreState(_ notification: Notification) {

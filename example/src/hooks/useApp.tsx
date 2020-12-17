@@ -6,7 +6,7 @@ import {
   DRMVideoEventName,
 } from 'react-native-drm-video-downloader';
 import DrmVideoDownloader from 'react-native-drm-video-downloader';
-import { NativeEventEmitter, NativeModules } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
 export const useApp = () => {
   // const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
@@ -36,11 +36,10 @@ export const useApp = () => {
             id: '7360f352-d459-475e-9351-970970b378e4',
             licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
             url: 'https://mvvuni-aase.streaming.media.azure.net/daa6aef5-c6c9-42ae-967b-ab190ad18a85/Big_Buck_Bunny_30s.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
-           // url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
-            scheme: 'widevine',
+            scheme: Platform.OS === 'ios' ? 'fairplay' : 'widevine',
             drmLicenseRequestHeaders: {
               Authorization:
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI3MzYwZjM1Mi1kNDU5LTQ3NWUtOTM1MS05NzA5NzBiMzc4ZTQiLCJuYmYiOjE2MDgxMTM0MzEsImV4cCI6MTYwODExNzMzMSwiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.THgjUKjJgbvzGmG622NkaDrt7Q0OW3m9BFMuhaopkr8',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI3MzYwZjM1Mi1kNDU5LTQ3NWUtOTM1MS05NzA5NzBiMzc4ZTQiLCJuYmYiOjE2MDgxOTc5NDcsImV4cCI6MTYwODIwMTg0NywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.xecu5D_kZ8UShT9pqb_AlSYgy3G3rTrQY-zSN1prwpw',
             },
             contentKeyIds: [
               'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4'
@@ -57,20 +56,21 @@ export const useApp = () => {
     }
   }, [videoRequestModel]);
 
-  // useEffect(() => {
-  //   var eventEmitter = new NativeEventEmitter(
-  //     NativeModules.DrmVideoDownloaderExample
-  //   );
-  //   var eventListenerSub = eventEmitter.addListener(
-  //     DRMVideoEventName,
-  //     (info?: DRMVideoInfo) => {
-  //       setVideoInfo(info);
-  //     }
-  //   );
-  //   return () => {
-  //     return eventListenerSub.remove();
-  //   };
-  // }, []);
+  useEffect(() => {
+    var eventEmitter = new NativeEventEmitter(
+      NativeModules.DrmVideoDownloader
+    );
+    var eventListenerSub = eventEmitter.addListener(
+      DRMVideoEventName,
+      (info?: DRMVideoInfo) => {
+        console.log('info',info)
+        setVideoInfo(info);
+      }
+    );
+    return () => {
+      return eventListenerSub.remove();
+    };
+  }, []);
 
   const getVideoStatus = () => {
     // DrmVideoDownloader.getDownloadableStatus(videoRequestModel).then(
@@ -79,11 +79,11 @@ export const useApp = () => {
     //   }
     // );
 
-    // DrmVideoDownloader.getDownloadableInfo(videoRequestModel).then(
-    //   (videoInfo?: DRMVideoInfo) => {
-    //     setVideoInfo(videoInfo);
-    //   }
-    // );
+    DrmVideoDownloader.getDownloadableInfo(videoRequestModel).then(
+      (videoInfo?: DRMVideoInfo) => {
+        setVideoInfo(videoInfo);
+      }
+    );
   };
 
   const download = () => {
@@ -118,7 +118,7 @@ export const useApp = () => {
     if (videoInfo) {
       switch (videoInfo.state) {
         case DRMVideoState.NOT_STARTED:
-          download();
+            download();
           break;
         case DRMVideoState.STATE_COMPLETED:
           {
