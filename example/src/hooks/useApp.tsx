@@ -18,17 +18,36 @@ export const useApp = () => {
   const [videoInfo, setVideoInfo] = useState<DRMVideoInfo | undefined>();
 
   useEffect(() => {
+    // for android
+    // setVideoRequestModel({
+    //   id: '495ac53d-831f-412b-98fe-5445bbecf5b1',
+    //   licenseUrl: 'https://proxy.uat.widevine.com/proxy?provider=widevine_test',
+    //   url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
+    //   scheme: 'widevine',
+    //   drmLicenseRequestHeaders: {
+    //     Authorization:
+    //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI0OTVhYzUzZC04MzFmLTQxMmItOThmZS01NDQ1YmJlY2Y1YjEiLCJuYmYiOjE2MDYyNzU0NzMsImV4cCI6MTYwNjI3OTM3MywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.B9dpaMMGK1Y-YR39KuOzCuZXpcFBDngTSxDEaYHB99Y',
+    //   },
+    //   title: 'Demo video',
+    // });
+
+    // for ios
     setVideoRequestModel({
-      id: '495ac53d-831f-412b-98fe-5445bbecf5b1',
-      licenseUrl: 'https://proxy.uat.widevine.com/proxy?provider=widevine_test',
-      url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
-      scheme: 'widevine',
-      drmLicenseRequestHeaders: {
-        Authorization:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI0OTVhYzUzZC04MzFmLTQxMmItOThmZS01NDQ1YmJlY2Y1YjEiLCJuYmYiOjE2MDYyNzU0NzMsImV4cCI6MTYwNjI3OTM3MywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.B9dpaMMGK1Y-YR39KuOzCuZXpcFBDngTSxDEaYHB99Y',
-      },
-      title: 'Demo video',
-    });
+            id: '7360f352-d459-475e-9351-970970b378e4',
+            licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
+            url: 'https://mvvuni-aase.streaming.media.azure.net/daa6aef5-c6c9-42ae-967b-ab190ad18a85/Big_Buck_Bunny_30s.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
+           // url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
+            scheme: 'widevine',
+            drmLicenseRequestHeaders: {
+              Authorization:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI3MzYwZjM1Mi1kNDU5LTQ3NWUtOTM1MS05NzA5NzBiMzc4ZTQiLCJuYmYiOjE2MDgxMTM0MzEsImV4cCI6MTYwODExNzMzMSwiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.THgjUKjJgbvzGmG622NkaDrt7Q0OW3m9BFMuhaopkr8',
+            },
+            contentKeyIds: [
+              'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4'
+            ],
+            title: 'Demo video',
+            isProtected: true
+    })
   }, []);
 
   useEffect(() => {
@@ -38,20 +57,20 @@ export const useApp = () => {
     }
   }, [videoRequestModel]);
 
-  useEffect(() => {
-    var eventEmitter = new NativeEventEmitter(
-      NativeModules.DrmVideoDownloaderExample
-    );
-    var eventListenerSub = eventEmitter.addListener(
-      DRMVideoEventName,
-      (info?: DRMVideoInfo) => {
-        setVideoInfo(info);
-      }
-    );
-    return () => {
-      return eventListenerSub.remove();
-    };
-  }, []);
+  // useEffect(() => {
+  //   var eventEmitter = new NativeEventEmitter(
+  //     NativeModules.DrmVideoDownloaderExample
+  //   );
+  //   var eventListenerSub = eventEmitter.addListener(
+  //     DRMVideoEventName,
+  //     (info?: DRMVideoInfo) => {
+  //       setVideoInfo(info);
+  //     }
+  //   );
+  //   return () => {
+  //     return eventListenerSub.remove();
+  //   };
+  // }, []);
 
   const getVideoStatus = () => {
     // DrmVideoDownloader.getDownloadableStatus(videoRequestModel).then(
@@ -60,11 +79,11 @@ export const useApp = () => {
     //   }
     // );
 
-    DrmVideoDownloader.getDownloadableInfo(videoRequestModel).then(
-      (videoInfo?: DRMVideoInfo) => {
-        setVideoInfo(videoInfo);
-      }
-    );
+    // DrmVideoDownloader.getDownloadableInfo(videoRequestModel).then(
+    //   (videoInfo?: DRMVideoInfo) => {
+    //     setVideoInfo(videoInfo);
+    //   }
+    // );
   };
 
   const download = () => {

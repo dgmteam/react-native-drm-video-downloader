@@ -10,7 +10,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-
+#import "DrmVideoDownloader.H"
 #if DEBUG
 #import <FlipperKit/FlipperClient.h>
 #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
@@ -33,9 +33,9 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  #if DEBUG
-    InitializeFlipper(application);
-  #endif
+//  #if DEBUG
+//    InitializeFlipper(application);
+//  #endif
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"DrmVideoDownloaderExample"
@@ -48,6 +48,7 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  [DrmVideoDownloader restorePersistenceManager];
   return YES;
 }
 
@@ -58,6 +59,18 @@ static void InitializeFlipper(UIApplication *application) {
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
+}
+
+- (NSData *)contentCertificate{
+  NSData* data = nil;
+  @try {
+    NSString* certUrl =  [[NSBundle mainBundle] pathForResource:@"fairplay" ofType:@"cer"];
+    data = [[NSData alloc] initWithContentsOfFile:certUrl];
+   }
+   @catch (NSException *exception) {
+     printf("Cannot load certificate");
+   }
+  return data;
 }
 
 @end

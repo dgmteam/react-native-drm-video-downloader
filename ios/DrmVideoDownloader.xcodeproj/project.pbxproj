@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-
-
-		F4FF95D7245B92E800C19C63 /*  DrmVideoDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /*  DrmVideoDownloader.swift */; };
-
-		5E555C0D2413F4C50049A1A2 /* DrmVideoDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* DrmVideoDownloader.mm */; };
+		1AB629B42570A94000279926 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB629B22570A93F00279926 /* Asset.swift */; };
+		1AB629B52570A94000279926 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB629B32570A94000279926 /* Stream.swift */; };
+		1AB629BC2570DE6800279926 /* DRMVideoRequestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB629BB2570DE6800279926 /* DRMVideoRequestModel.swift */; };
+		1AB629BF2570E00500279926 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB629BE2570E00500279926 /* Constants.swift */; };
+		1AB629C12570E02D00279926 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB629C02570E02D00279926 /* Utils.swift */; };
+		F4FF95D7245B92E800C19C63 /* DrmVideoDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* DrmVideoDownloader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,13 +28,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		11BEEBF1258A2093003A621E /* DrmVideoDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrmVideoDownloader.h; sourceTree = "<group>"; };
+		11BEEBF2258A20B5003A621E /* Manager */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Manager; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libDrmVideoDownloader.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDrmVideoDownloader.a; sourceTree = BUILT_PRODUCTS_DIR; };
-
-
+		1AB629B22570A93F00279926 /* Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
+		1AB629B32570A94000279926 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
+		1AB629BB2570DE6800279926 /* DRMVideoRequestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DRMVideoRequestModel.swift; sourceTree = "<group>"; };
+		1AB629BE2570E00500279926 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		1AB629C02570E02D00279926 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* DrmVideoDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrmVideoDownloader.m; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* DrmVideoDownloader-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DrmVideoDownloader-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* DrmVideoDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrmVideoDownloader.swift; sourceTree = "<group>"; };
-
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,15 +60,43 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		1AB6299F2570A89F00279926 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				11BEEBF2258A20B5003A621E /* Manager */,
+				1AB629BD2570DFEC00279926 /* Utils */,
+				1AB629A12570A8BB00279926 /* Model */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		1AB629A12570A8BB00279926 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				1AB629B22570A93F00279926 /* Asset.swift */,
+				1AB629B32570A94000279926 /* Stream.swift */,
+				1AB629BB2570DE6800279926 /* DRMVideoRequestModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		1AB629BD2570DFEC00279926 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				1AB629BE2570E00500279926 /* Constants.swift */,
+				1AB629C02570E02D00279926 /* Utils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-
-
+				11BEEBF1258A2093003A621E /* DrmVideoDownloader.h */,
+				1AB6299F2570A89F00279926 /* Shared */,
 				F4FF95D6245B92E800C19C63 /* DrmVideoDownloader.swift */,
 				B3E7B5891CC2AC0600A0062D /* DrmVideoDownloader.m */,
 				F4FF95D5245B92E700C19C63 /* DrmVideoDownloader-Bridging-Header.h */,
-
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,11 +158,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-
-
+				1AB629B42570A94000279926 /* Asset.swift in Sources */,
+				1AB629BC2570DE6800279926 /* DRMVideoRequestModel.swift in Sources */,
+				1AB629C12570E02D00279926 /* Utils.swift in Sources */,
 				F4FF95D7245B92E800C19C63 /* DrmVideoDownloader.swift in Sources */,
-				B3E7B58A1CC2AC0600A0062D /* DrmVideoDownloader.m in Sources */,
-
+				1AB629BF2570E00500279926 /* Constants.swift in Sources */,
+				1AB629B52570A94000279926 /* Stream.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,11 +276,9 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = DrmVideoDownloader;
 				SKIP_INSTALL = YES;
-
 				SWIFT_OBJC_BRIDGING_HEADER = "DrmVideoDownloader-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -263,10 +295,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = DrmVideoDownloader;
 				SKIP_INSTALL = YES;
-
 				SWIFT_OBJC_BRIDGING_HEADER = "DrmVideoDownloader-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
