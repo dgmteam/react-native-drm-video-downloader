@@ -190,7 +190,6 @@ public class AssetPersistenceManager: NSObject {
             task = taskKey
             break
         }
-        
         task?.cancel()
     }
 }
@@ -285,8 +284,9 @@ extension AssetPersistenceManager: AVAssetDownloadDelegate {
             userInfo[Asset.Keys.downloadState] = Asset.DownloadState.downloaded.rawValue
             userInfo[Asset.Keys.downloadSelectionDisplayName] = ""
         }
-        
-        NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        if (shouldUpdateProgressChanged){
+            NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
+        }
     }
     
     /// Method called when the an aggregate download task determines the location this asset will be downloaded to.
@@ -310,60 +310,43 @@ extension AssetPersistenceManager: AVAssetDownloadDelegate {
          This delegate callback provides an AVMediaSelection object which is now fully available for
          offline use. You can perform any additional processing with the object here.
          */
-        
-        guard let asset = activeDownloadsMap[aggregateAssetDownloadTask] else { return }
-        
-        // Prepare the basic userInfo dictionary that will be posted as part of our notification.
-        var userInfo = [String: Any]()
-        userInfo[Asset.Keys.name] = asset.stream.name
-        
-        aggregateAssetDownloadTask.taskDescription = asset.stream.name
-        
-        aggregateAssetDownloadTask.resume()
-        
-        userInfo[Asset.Keys.downloadState] = Asset.DownloadState.downloading.rawValue
-        userInfo[Asset.Keys.downloadSelectionDisplayName] = displayNamesForSelectedMediaOptions(mediaSelection)
-        
-        NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
-    }
-    public func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange, for mediaSelection: AVMediaSelection) {
-        // This delegate callback should be used to provide download progress for your AVAssetDownloadTask.
-        guard let asset = activeDownloadsMap[aggregateAssetDownloadTask] else { return }
-
-        var percentComplete = 0.0
-        for value in loadedTimeRanges {
-            let loadedTimeRange: CMTimeRange = value.timeRangeValue
-            percentComplete +=
-                CMTimeGetSeconds(loadedTimeRange.duration) / CMTimeGetSeconds(timeRangeExpectedToLoad.duration)
+        if (shouldUpdateProgressChanged){
+            guard let asset = activeDownloadsMap[aggregateAssetDownloadTask] else { return }
+            
+            // Prepare the basic userInfo dictionary that will be posted as part of our notification.
+            var userInfo = [String: Any]()
+            userInfo[Asset.Keys.name] = asset.stream.name
+            
+            aggregateAssetDownloadTask.taskDescription = asset.stream.name
+            
+            aggregateAssetDownloadTask.resume()
+            
+            userInfo[Asset.Keys.downloadState] = Asset.DownloadState.downloading.rawValue
+            userInfo[Asset.Keys.downloadSelectionDisplayName] = displayNamesForSelectedMediaOptions(mediaSelection)
+            
+            NotificationCenter.default.post(name: .AssetDownloadStateChanged, object: nil, userInfo: userInfo)
         }
-
-        var userInfo = [String: Any]()
-        userInfo[Asset.Keys.name] = asset.stream.name
-        userInfo[Asset.Keys.percentDownloaded] = percentComplete
-
-        NotificationCenter.default.post(name: .AssetDownloadProgress, object: nil, userInfo: userInfo)
     }
     /// Method to adopt to subscribe to progress updates of an AVAggregateAssetDownloadTask.
-//    func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask,
-//                    didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue],
-//                    timeRangeExpectedToLoad: CMTimeRange, for mediaSelection: AVMediaSelection) {
-//
-//        // This delegate callback should be used to provide download progress for your AVAssetDownloadTask.
-//        guard let asset = activeDownloadsMap[aggregateAssetDownloadTask] else { return }
-//
-//        var percentComplete = 0.0
-//        for value in loadedTimeRanges {
-//            let loadedTimeRange: CMTimeRange = value.timeRangeValue
-//            percentComplete +=
-//                CMTimeGetSeconds(loadedTimeRange.duration) / CMTimeGetSeconds(timeRangeExpectedToLoad.duration)
-//        }
-//
-//        var userInfo = [String: Any]()
-//        userInfo[Asset.Keys.name] = asset.stream.name
-//        userInfo[Asset.Keys.percentDownloaded] = percentComplete
-//
-//        NotificationCenter.default.post(name: .AssetDownloadProgress, object: nil, userInfo: userInfo)
-//    }
+    public func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange, for mediaSelection: AVMediaSelection) {
+        // This delegate callback should be used to provide download progress for your AVAssetDownloadTask.
+        if (shouldUpdateProgressChanged){
+            guard let asset = activeDownloadsMap[aggregateAssetDownloadTask] else { return }
+
+            var percentComplete = 0.0
+            for value in loadedTimeRanges {
+                let loadedTimeRange: CMTimeRange = value.timeRangeValue
+                percentComplete +=
+                    CMTimeGetSeconds(loadedTimeRange.duration) / CMTimeGetSeconds(timeRangeExpectedToLoad.duration)
+            }
+
+            var userInfo = [String: Any]()
+            userInfo[Asset.Keys.name] = asset.stream.name
+            userInfo[Asset.Keys.percentDownloaded] = percentComplete
+
+            NotificationCenter.default.post(name: .AssetDownloadProgress, object: nil, userInfo: userInfo)
+        }
+    }
 }
 
 extension AssetPersistenceManager {
@@ -373,6 +356,10 @@ extension AssetPersistenceManager {
     
     func disableTrackingEvent() {
         self.shouldUpdateProgressChanged = false
+    }
+    
+    func isEnableTrackingEvent() -> Bool {
+        return self.shouldUpdateProgressChanged
     }
 }
 
@@ -397,5 +384,7 @@ extension Notification.Name {
     
     /// Notification for when AssetPersistenceManager has completely restored its state.
     static let AssetPersistenceManagerDidRestoreState = Notification.Name(rawValue: "AssetPersistenceManagerDidRestoreStateNotification")
+    
+    static let AssetDownloadFail = Notification.Name(rawValue: "AssetDownloadFailNotification")
 }
 
