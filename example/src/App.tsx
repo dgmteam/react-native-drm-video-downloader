@@ -6,12 +6,12 @@ import { useApp } from './hooks/useApp';
 export default function App() {
   const AppHook = useApp();
 
-  // React.useEffect(() => {
-  //   DrmVideoDownloader.registerTrackingEvent();
-  //   return () => {
-  //     DrmVideoDownloader.unregisterTrackingEvent();
-  //   };
-  // }, []);
+  React.useEffect(() => {
+    DrmVideoDownloader.registerTrackingEvent();
+    return () => {
+      DrmVideoDownloader.unregisterTrackingEvent();
+    };
+  }, []);
 
   return (
     <View>

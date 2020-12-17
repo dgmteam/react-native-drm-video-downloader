@@ -14,13 +14,19 @@ class Asset {
     
     /// The underlying `Stream` associated with the Asset based on the contents of the `Streams.plist` entry.
     let stream: Stream
+    var state: DownloadState = .notDownloaded {
+        didSet {
+            if (state == .notDownloaded){
+                self.progress = 0.0
+            }
+        }
+    }
+    
+    var progress: Double = 0.0
     
     init(stream: Stream, urlAsset: AVURLAsset) {
         self.stream = stream
         self.urlAsset = urlAsset
-        if self.stream.isProtected {
-            ContentKeyManager.shared.contentKeySession.addContentKeyRecipient(self.urlAsset)
-        }
     }
 }
 
@@ -78,16 +84,18 @@ extension Asset {
          `AssetDownloadStateChangedNotification` Notification.
          */
         static let downloadSelectionDisplayName = "AssetDownloadSelectionDisplayNameKey"
+        
+        static let identifier = "AssetIdentifier"
     }
 }
 
 extension Asset {
-    func toResult(action: String, progress: Float?, state: Asset.DownloadState?) -> NSDictionary {
+    func toResult(action: String) -> NSDictionary {
         let ret = NSMutableDictionary.init()
         ret.setValue(action, forKey: Constants.EVENT_DOWNLOAD_DRM_VIDEO_ACTION)
         ret.setValue(self.stream.name, forKey: Constants.VIDEO_ID)
         ret.setValue(self.stream.playlistURL, forKey: Constants.VIDEO_URL)
-        ret.setValue(Utils.getState(state: state ?? .notDownloaded), forKey: Constants.RESULT_STATE)
+        ret.setValue(Utils.getState(state: self.state ), forKey: Constants.RESULT_STATE)
         ret.setValue(progress, forKey: Constants.RESULT_PROGRESS)
         return ret
     }

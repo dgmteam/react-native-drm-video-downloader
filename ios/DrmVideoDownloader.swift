@@ -1,5 +1,5 @@
 @objc(DrmVideoDownloader)
-class DrmVideoDownloader: NSObject {
+class DrmVideoDownloader: RCTEventEmitter {
     @objc
     static func restorePersistenceManager() {
         print("restorePersistenceManager")
@@ -36,7 +36,7 @@ class DrmVideoDownloader: NSObject {
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             AssetListManager.sharedManager.add(asset: asset)
             if videoRequestModel?.isProtected ?? false{
-                self.registerTrackingEvent()
+                ContentKeyManager.shared.contentKeySession.addContentKeyRecipient(asset.urlAsset)
                 ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAsset: asset)
             } else {
                 AssetPersistenceManager.sharedManager.downloadStream(for: asset)
@@ -52,7 +52,8 @@ class DrmVideoDownloader: NSObject {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-            let ret = asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE, progress: 0, state: state)
+            asset.state = state
+            let ret = asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE)
             resolve(ret)
         } else {
             reject("1000", "The request is invalid", nil)
@@ -61,53 +62,50 @@ class DrmVideoDownloader: NSObject {
     
     @objc(getDownloadableStatus:withResolver:withRejecter:)
     func getDownloadableStatus(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-//    func getDownloadableStatus(params: NSDictionary) -> Asset.DownloadState {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-//            return state
             resolve(Utils.getState(state: state))
         } else {
             reject("1000", "The request is invalid", nil)
         }
-//        return .notDownloaded
     }
     
     @objc(removeDownload:withResolver:withRejecter:)
     func removeDownload(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-//    func removeDownload(params: NSDictionary){
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
-            AssetPersistenceManager.sharedManager.cancelDownload(for: asset)
+            let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
+            if state == .downloaded {
+                self.deleteDownload(asset: asset)
+            } else {
+                self.cancelDownload(asset: asset)
+            }
             resolve(true)
         } else {
             reject("1000", "The request is invalid", nil)
         }
     }
     
-//    func delete(params: NSDictionary) {
-//        let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
-//        if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
-//            AssetPersistenceManager.sharedManager.deleteAsset(asset)
-//            ContentKeyManager.shared.contentKeyDelegate.deleteAllPeristableContentKeys(forAsset: asset)
-//        } else {
-//            reject("1000", "The request is invalid", nil)
-//        }
-//    }
-//    @objc
-//    func restorePersistenceManager(){
-//        print("restorePersistenceManager")
-//        AssetPersistenceManager.sharedManager.restorePersistenceManager()
-//    }
+    fileprivate func cancelDownload(asset:Asset) -> Void {
+        AssetPersistenceManager.sharedManager.cancelDownload(for: asset)
+    }
+    
+    func deleteDownload(asset:Asset) -> Void {
+        AssetPersistenceManager.sharedManager.deleteAsset(asset)
+        ContentKeyManager.shared.contentKeyDelegate.deleteAllPeristableContentKeys(forAsset: asset)
+    }
     
     @objc
     func registerTrackingEvent(){
+        print("register tracking event")
         AssetPersistenceManager.sharedManager.enableTrackingEvent()
         self.registerEventWithNotificationCenter()
     }
     
     @objc
     func unregisterTrackingEvent(){
+        print("unregister tracking event")
         AssetPersistenceManager.sharedManager.disableTrackingEvent()
         self.unregisterEventWithNotificationCenter()
     }
@@ -115,6 +113,9 @@ class DrmVideoDownloader: NSObject {
     @objc
     func clearAllListener(){
         self.unregisterTrackingEvent()
+    }
+    override func supportedEvents() -> [String]! {
+        return [Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME]
     }
 }
 
@@ -126,6 +127,9 @@ extension DrmVideoDownloader {
                                        name: .AssetDownloadStateChanged, object: nil)
         notificationCenter.addObserver(self, selector: #selector(handleAssetDownloadProgress(_:)),
                                        name: .AssetDownloadProgress, object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleAssetDownloadFailed(_:)),
+                                       name: .AssetDownloadFail, object: nil)
     }
     
     func unregisterEventWithNotificationCenter(){
@@ -134,6 +138,9 @@ extension DrmVideoDownloader {
                                                   object: nil)
         NotificationCenter.default.removeObserver(self,
                                                   name: .AssetDownloadProgress,
+                                                  object: nil)
+        NotificationCenter.default.removeObserver(self,
+                                                  name: .AssetDownloadFail,
                                                   object: nil)
     }
 }
@@ -145,7 +152,11 @@ extension DrmVideoDownloader {
             let downloadStateRawValue = notification.userInfo![Asset.Keys.downloadState] as? String,
             let downloadState = Asset.DownloadState(rawValue: downloadStateRawValue),
             let asset = AssetListManager.sharedManager.with(streamName: assetStreamName) else { return }
-        print("handleAssetDownloadStateChanged")
+        asset.state = downloadState
+        if downloadState == .downloaded {
+            ContentKeyManager.shared.contentKeySession.removeContentKeyRecipient(asset.urlAsset)
+        }
+        self.sendEvents(eventName: Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, params: asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE))
     }
     
     @objc
@@ -153,7 +164,23 @@ extension DrmVideoDownloader {
         print("handleAssetDownloadProgress")
         guard let assetStreamName = notification.userInfo![Asset.Keys.name] as? String, let asset = AssetListManager.sharedManager.with(streamName: assetStreamName) else { return }
         guard let progress = notification.userInfo![Asset.Keys.percentDownloaded] as? Double else { return }
-        print("progress percent \(progress)")
-       // self.downloadProgressView.setProgress(Float(progress), animated: true)    }
+        asset.progress = progress
+        asset.state = .downloading
+        self.sendEvents(eventName: Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, params: asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS))
+    }
+    @objc
+    func handleAssetDownloadFailed(_ notification: Notification){
+        print("handleAssetDownloadFailed")
+        if let identifier = notification.userInfo![Asset.Keys.identifier] as? String, let asset = AssetListManager.sharedManager.with(identifier: identifier) {
+            self.sendEvents(eventName: Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, params: asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_FAIL))
+        }
+    }
+}
+
+extension DrmVideoDownloader {
+    fileprivate func sendEvents(eventName: String, params: NSDictionary?) {
+        if (AssetPersistenceManager.sharedManager.isEnableTrackingEvent()){
+            sendEvent(withName: eventName, body: params ?? [:])
+        }
     }
 }
