@@ -8,6 +8,7 @@ export interface DRMVideoRequestModel {
   title?: string;
   drmLicenseRequestHeaders?: object;
   isProtected?: boolean
+  contentKeyIds?: string[]
 }
 
 export const DRMVideoEventName = 'DownloadDrmVideo'
