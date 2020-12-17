@@ -164,7 +164,7 @@ extension DrmVideoDownloader {
         print("handleAssetDownloadProgress")
         guard let assetStreamName = notification.userInfo![Asset.Keys.name] as? String, let asset = AssetListManager.sharedManager.with(streamName: assetStreamName) else { return }
         guard let progress = notification.userInfo![Asset.Keys.percentDownloaded] as? Double else { return }
-        asset.progress = progress
+        asset.progress = progress * 100
         asset.state = .downloading
         self.sendEvents(eventName: Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, params: asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS))
     }

@@ -18,36 +18,47 @@ export const useApp = () => {
   const [videoInfo, setVideoInfo] = useState<DRMVideoInfo | undefined>();
 
   useEffect(() => {
-    // for android
-    // setVideoRequestModel({
-    //   id: '495ac53d-831f-412b-98fe-5445bbecf5b1',
-    //   licenseUrl: 'https://proxy.uat.widevine.com/proxy?provider=widevine_test',
-    //   url: 'https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd',
-    //   scheme: 'widevine',
-    //   drmLicenseRequestHeaders: {
-    //     Authorization:
-    //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI0OTVhYzUzZC04MzFmLTQxMmItOThmZS01NDQ1YmJlY2Y1YjEiLCJuYmYiOjE2MDYyNzU0NzMsImV4cCI6MTYwNjI3OTM3MywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.B9dpaMMGK1Y-YR39KuOzCuZXpcFBDngTSxDEaYHB99Y',
-    //   },
-    //   title: 'Demo video',
-    // });
-
-    // for ios
-    setVideoRequestModel({
-            id: '7360f352-d459-475e-9351-970970b378e4',
-            licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
-            url: 'https://mvvuni-aase.streaming.media.azure.net/daa6aef5-c6c9-42ae-967b-ab190ad18a85/Big_Buck_Bunny_30s.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
-            scheme: Platform.OS === 'ios' ? 'fairplay' : 'widevine',
-            drmLicenseRequestHeaders: {
-              Authorization:
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI3MzYwZjM1Mi1kNDU5LTQ3NWUtOTM1MS05NzA5NzBiMzc4ZTQiLCJuYmYiOjE2MDgxOTc5NDcsImV4cCI6MTYwODIwMTg0NywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.xecu5D_kZ8UShT9pqb_AlSYgy3G3rTrQY-zSN1prwpw',
-            },
-            contentKeyIds: [
-              'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4'
-            ],
-            title: 'Demo video',
-            isProtected: true
-    })
+      if (Platform.OS === 'android'){
+        createModelForAndroid()
+      } else {
+        createModelForiOS()
+      }
+    
   }, []);
+
+  const createModelForAndroid = () => {
+    setVideoRequestModel({
+      id: 'b4d51cd8-adb3-4eed-bd18-e417944a5d3c',
+      licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
+      url: 'https://mvvuni-aase.streaming.media.azure.net/f12053ab-1009-43dd-8e6e-44b1ba5000ed/Big_Buck_Bunny_30s.ism/manifest(format=mpd-time-csf,encryption=cenc)',
+      scheme: 'widevine',
+      drmLicenseRequestHeaders: {
+        Authorization:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiJiNGQ1MWNkOC1hZGIzLTRlZWQtYmQxOC1lNDE3OTQ0YTVkM2MiLCJuYmYiOjE2MDgyMDE3MzgsImV4cCI6MTYwODIwNTYzOCwiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.FcPVT1eVw9-Cr0w459SFfplSSv9xGud4brfqO1rTrso',
+      },
+      title: 'Demo video',
+      isProtected: true
+})
+  }
+
+  const createModelForiOS = () => {
+    setVideoRequestModel({
+      id: '7360f352-d459-475e-9351-970970b378e4',
+      licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
+      url: 'https://mvvuni-aase.streaming.media.azure.net/daa6aef5-c6c9-42ae-967b-ab190ad18a85/Big_Buck_Bunny_30s.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
+      scheme: 'fairplay',
+      drmLicenseRequestHeaders: {
+        Authorization:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI3MzYwZjM1Mi1kNDU5LTQ3NWUtOTM1MS05NzA5NzBiMzc4ZTQiLCJuYmYiOjE2MDgxOTc5NDcsImV4cCI6MTYwODIwMTg0NywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.xecu5D_kZ8UShT9pqb_AlSYgy3G3rTrQY-zSN1prwpw',
+      },
+      contentKeyIds: [
+        'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4'
+      ],
+      title: 'Demo video',
+      isProtected: true
+})
+  }
+
 
   useEffect(() => {
     DRMVideoState;
