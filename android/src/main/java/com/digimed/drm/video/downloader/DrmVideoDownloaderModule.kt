@@ -1,5 +1,6 @@
 package com.digimed.drm.video.downloader
 
+import android.net.Uri
 import com.digimed.drm.video.downloader.extensions.toResult
 import com.digimed.drm.video.downloader.models.DRMVideoDownloadErrorModel
 import com.digimed.drm.video.downloader.trackers.DownloadDrmVideoManager
@@ -11,6 +12,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
+import com.google.android.exoplayer2.offline.DownloadRequest
+import com.google.android.exoplayer2.util.Log
 import java.lang.Exception
 import javax.annotation.Nullable
 
@@ -18,7 +21,6 @@ import javax.annotation.Nullable
 class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Listener{
   private val TAG = "DrmVideoDownloaderModule"
   constructor(reactContext: ReactApplicationContext) : super(reactContext) {
-    DownloadDrmVideoManager.getInstance().initial(reactContext)
   }
 
   override fun getName(): String {
@@ -27,6 +29,7 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun isDownloaded(params: ReadableMap, promise: Promise){
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     var mediaItem = videoRequestModel?.toMediaItem()
     val isDownloaded = DownloadDrmVideoManager.getInstance().isDownload(mediaItem)
@@ -35,24 +38,28 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun pauseAllDownload(promise: Promise){
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().pauseAllDownload()
     promise.resolve(true)
   }
 
   @ReactMethod
   fun removeAllDownload(promise: Promise){
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().removeAllDownload()
     promise.resolve(true)
   }
 
   @ReactMethod
   fun resumeAllDownload(promise: Promise){
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().resumeAllDownload()
     promise.resolve(true)
   }
 
   @ReactMethod
   fun removeDownload(params: ReadableMap, promise: Promise){
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     var mediaItem = videoRequestModel?.toMediaItem()
     DownloadDrmVideoManager.getInstance().removeDownload(mediaItem)
@@ -60,7 +67,8 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
   }
 
   @ReactMethod
-    fun download(params: ReadableMap, promise: Promise) {
+  fun download(params: ReadableMap, promise: Promise) {
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     if (Utils.isValidRequest(videoRequestModel)) {
       var mediaItem = videoRequestModel?.toMediaItem()
@@ -73,6 +81,7 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun getDownloadableStatus(params: ReadableMap, promise: Promise) {
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     if (Utils.isValidRequest(videoRequestModel)) {
       var mediaItem = videoRequestModel?.toMediaItem()
@@ -85,6 +94,7 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun getDownloadableInfo(params: ReadableMap, promise: Promise) {
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     if (Utils.isValidRequest(videoRequestModel)) {
       var mediaItem = videoRequestModel?.toMediaItem()
@@ -97,6 +107,7 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun registerTrackingEvent(){
+    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().addListener(this)
   }
 
@@ -110,16 +121,33 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
     DownloadDrmVideoManager.getInstance().clearListener()
   }
 
-  override fun onDownloadChanged(downloadManager: DownloadManager?, download: Download?) {
-    sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, download?.toResult(Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE))
+  @ReactMethod
+  fun release(){
+    DownloadDrmVideoManager.getInstance().release()
+  }
+
+  override fun onDownloadChanged(downloadManager: DownloadManager?, download: Download?, keySetId: String?) {
+    if (download?.state == Download.STATE_COMPLETED){
+      var downloadTracker = Utils.getDownloadTracker(this.reactApplicationContext)
+      var downloadRequest = downloadTracker?.getDownloadRequest(download.request.uri)
+      Log.d(TAG,  "onDownload completed");
+//      downloadTracker.getDownloadRequest(checkNotNull(item.playbackProperties).uri);
+    }
+    sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, download?.toResult(Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE, keySetId = keySetId))
   }
 
   override fun onDownloadFailed(mediaItem: MediaItem?, exception: Exception?) {
     sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME,DRMVideoDownloadErrorModel(1000, "The request download failed", mediaId = mediaItem?.mediaId).toWritableMap(Constants.EVENT_NAME_DOWNLOAD_FAIL))
   }
 
-  override fun onDownloadChangeProgress( download: Download?) {
-    sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, download?.toResult(Constants.EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS))
+  override fun onDownloadChangeProgress( download: Download?, keySetId: String?) {
+    if (download?.state == Download.STATE_COMPLETED){
+      var downloadTracker = Utils.getDownloadTracker(this.reactApplicationContext)
+      var downloadRequest = downloadTracker?.getDownloadRequest(download.request.uri)
+      Log.d(TAG,  "onDownload completed");
+//      downloadTracker.getDownloadRequest(checkNotNull(item.playbackProperties).uri);
+    }
+    sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, download?.toResult(Constants.EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS, keySetId = keySetId))
   }
 
   private fun sendEvent(eventName: String,@Nullable params: WritableMap?){

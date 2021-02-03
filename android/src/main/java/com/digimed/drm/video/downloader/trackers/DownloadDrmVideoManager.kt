@@ -9,7 +9,7 @@ import com.google.android.exoplayer2.offline.Download
 
 class DownloadDrmVideoManager{
   init {
-      //
+    //
   }
   private constructor(){
 
@@ -26,10 +26,12 @@ class DownloadDrmVideoManager{
     }
   }
 
-   fun initial(context: Context?){
-     context?.let {
-       this.downloadTracker = Utils.getDownloadTracker(context)
-     }
+  fun initial(context: Context?){
+    if (downloadTracker == null){
+      context?.let {
+        this.downloadTracker = Utils.getDownloadTracker(context.applicationContext)
+      }
+    }
   }
 
   fun download(context: Context, mediaItem: MediaItem?, keyRequestProperty: Map<String, String>?){
@@ -77,5 +79,12 @@ class DownloadDrmVideoManager{
 
   fun clearListener(){
     downloadTracker?.clearListener()
+  }
+
+  fun release(){
+    this.pauseAllDownload()
+    downloadTracker?.release()
+    downloadTracker = null
+    Utils.release()
   }
 }

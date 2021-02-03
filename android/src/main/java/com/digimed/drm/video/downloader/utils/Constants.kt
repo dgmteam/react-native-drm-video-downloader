@@ -13,6 +13,7 @@ class Constants {
     const val VIDEO_SCHEME = "scheme"
     const val VIDEO_TITLE = "title"
     const val VIDEO_LICENSE_REQUEST_HEADER = "drmLicenseRequestHeaders"
+    const val VIDEO_KEY_SET_ID = "keySetId"
 
     const val RESULT_PROGRESS = "progress"
     const val RESULT_STATE = "state"

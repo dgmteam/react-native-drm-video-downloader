@@ -37,7 +37,7 @@ class StartDownloadHelper: DownloadHelper.Callback {
   private var context: Context? = null
   private var mappedTrackInfo: MappedTrackInfo? = null
   private var listener: Listener? = null
-  @Nullable private var keySetId: ByteArray? = null
+  @Nullable private var keySetId: String? = null
   constructor(context: Context?, mediaItem: MediaItem?, drmSessionManager: DefaultDrmSessionManager?, downloadHelper: DownloadHelper, listener: Listener){
     this.downloadHelper = downloadHelper
     this.mediaItem = mediaItem
@@ -65,7 +65,7 @@ class StartDownloadHelper: DownloadHelper.Callback {
         + " supported")
       return
     }
-      this.fetchLicense(format)
+    this.fetchLicense(format)
   }
 
   private fun fetchLicense(format: Format?){
@@ -74,17 +74,15 @@ class StartDownloadHelper: DownloadHelper.Callback {
       var thread = Thread {
         val offlineLicenseHelper = OfflineLicenseHelper(this.drmSessionManager!!, DrmSessionEventListener.EventDispatcher())
         try {
-          this.keySetId = offlineLicenseHelper.downloadLicense(it)
-          Log.d(TAG, "get key set id completed")
-//          val p = offlineLicenseHelper.getLicenseDurationRemainingSec(keySetId!!)
-//          Log.d("test", "load video keyset")
-        } catch (e: DrmSessionException) {
+          val keySetIdBytes = offlineLicenseHelper.downloadLicense(it)
+          this.keySetId = String(keySetIdBytes!!)
+        } catch (e: Exception) {
           exception = e
         } finally {
           offlineLicenseHelper.release()
         }
         Handler(Looper.getMainLooper()).post {
-           onOfflineLicenseFetched(exception)
+          onOfflineLicenseFetched(exception)
         }
       }
       thread.run()
@@ -126,11 +124,11 @@ class StartDownloadHelper: DownloadHelper.Callback {
     context?.let {
       DownloadService.sendAddDownload(it, VideoDownloaderService::class.java, downloadRequest,  /* foreground= */false)
     }
-
   }
 
   private fun buildDownloadRequest(): DownloadRequest? {
-    return downloadHelper?.getDownloadRequest(Util.getUtf8Bytes(Assertions.checkNotNull(mediaItem!!.mediaMetadata.title)))?.copyWithKeySetId(keySetId)
+    val keySetIdBytes = this.keySetId?.toByteArray();
+    return downloadHelper?.getDownloadRequest(Util.getUtf8Bytes(Assertions.checkNotNull(mediaItem!!.mediaMetadata.title)))?.copyWithKeySetId(keySetIdBytes)
   }
 
   // Internal methods.
@@ -172,9 +170,12 @@ class StartDownloadHelper: DownloadHelper.Callback {
     return false
   }
 
+  fun getKeySetID(): String?{
+    return this.keySetId;
+  }
+
   fun  release(){
     this.downloadHelper?.release()
   }
-
 
 }

@@ -31,7 +31,7 @@ import java.util.concurrent.Executors
 
 class Utils private constructor(){
   companion object {
-    private const val TAG = "DemoUtil"
+    private const val TAG = "Utils"
 
     private var dataSourceFactory: DataSource.Factory? = null
     private var httpDataSourceFactory: HttpDataSource.Factory? = null
@@ -195,6 +195,18 @@ class Utils private constructor(){
         ret = DRMVideoRequestModel(id = id, licenseUrl = licenseUrl, scheme = videoScheme, url = videoUrl, title = videoTitle, drmLicenseRequestHeaders = videoLicenseRequestHeader);
       }
       return ret
+    }
+    fun release(){
+      this.downloadCache?.release()
+      this.downloadCache = null
+      this.dataSourceFactory = null;
+      this.databaseProvider = null;
+      this.downloadDirectory = null;
+      this.downloadManager?.release()
+      this.downloadManager = null;
+      this.downloadNotificationHelper = null;
+      this.downloadTracker = null;
+      this.httpDataSourceFactory = null;
     }
   }
 }

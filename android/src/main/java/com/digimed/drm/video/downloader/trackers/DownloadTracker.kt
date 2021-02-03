@@ -27,9 +27,9 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
   /** Listens for changes in the tracked downloads.  */
   interface Listener {
     /** Called when the tracked downloads changed.  */
-    fun onDownloadChanged(downloadManager: DownloadManager?, download: Download?)
+    fun onDownloadChanged(downloadManager: DownloadManager?, download: Download?, keySetId: String?)
     fun onDownloadFailed(mediaItem: MediaItem?, exception: java.lang.Exception?)
-    fun onDownloadChangeProgress(download: Download?)
+    fun onDownloadChangeProgress(download: Download?,keySetId: String?)
   }
   private val TAG = "DownloadTracker"
   private var context: Context? = null
@@ -41,6 +41,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
   private var timer: Timer? = null
   private var downloadManager: DownloadManager? = null
   private var isStart: Boolean = false
+  private var startDownloadHelper: StartDownloadHelper? = null
 
   constructor(
     context: Context,
@@ -110,7 +111,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
       val drmSessionManager: DefaultDrmSessionManager = DefaultDrmSessionManager.Builder()
         .setUuidAndExoMediaDrmProvider(drmSchemeUuid, FrameworkMediaDrm.DEFAULT_PROVIDER)
         .build(drmCallback)
-      val startDownloadHelper = StartDownloadHelper(this.context?.applicationContext, mediaItem, drmSessionManager, DownloadHelper.forMediaItem(
+      startDownloadHelper = StartDownloadHelper(this.context?.applicationContext, mediaItem, drmSessionManager, DownloadHelper.forMediaItem(
         mediaItem, DownloadHelper.getDefaultTrackSelectorParameters(context!!), renderersFactory, httpDataSourceFactory), this)
       startTrackingProgressChanged()
     }
@@ -121,7 +122,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
       val download = downloads!![Assertions.checkNotNull(mediaItem?.playbackProperties).uri]
       if (download != null){
 //        if (download.state === Download.STATE_DOWNLOADING){
-          DownloadService.sendRemoveDownload(context!!, VideoDownloaderService::class.java, download.request.id, false)
+        DownloadService.sendRemoveDownload(context!!, VideoDownloaderService::class.java, download.request.id, false)
 //        }
       }
     }
@@ -185,7 +186,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
   fun fireOnDownloadChangeProgress( download: Download){
     listeners?.let {
       for (listener in it) {
-        listener.onDownloadChangeProgress(download)
+        listener.onDownloadChangeProgress(download, keySetId = this.startDownloadHelper?.getKeySetID())
       }
     }
   }
@@ -194,7 +195,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
     downloads?.put(download.request.uri, download)
     listeners?.let {
       for (listener in it) {
-        listener.onDownloadChanged(downloadManager, download)
+        listener.onDownloadChanged(downloadManager, download, keySetId =  this.startDownloadHelper?.getKeySetID())
       }
     }
     startTrackingProgressChanged()
@@ -204,7 +205,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
     downloads?.remove(download.request.uri)
     listeners?.let {
       for (listener in it) {
-        listener.onDownloadChanged(downloadManager, download)
+        listener.onDownloadChanged(downloadManager, download, keySetId = null)
       }
     }
   }
@@ -215,5 +216,12 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
         listener.onDownloadFailed(mediaItem, exception)
       }
     }
+  }
+
+  fun release(){
+    downloadManager?.release()
+    downloadManager = null;
+    startDownloadHelper?.release()
+    startDownloadHelper = null
   }
 }
