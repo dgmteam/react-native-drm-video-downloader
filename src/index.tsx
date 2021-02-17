@@ -7,16 +7,16 @@ export interface DRMVideoRequestModel {
   scheme?: string;
   title?: string;
   drmLicenseRequestHeaders?: object;
-  isProtected?: boolean
-  contentKeyIds?: string[]
+  isProtected?: boolean;
+  contentKeyIds?: string[];
 }
 
-export const DRMVideoEventName = 'DownloadDrmVideo'
+export const DRMVideoEventName = 'DownloadDrmVideo';
 export const DRMVideoActionName = {
   ChangeState: 'DOWNLOAD_CHANGE_STATE',
   DownloadFail: 'DOWNLOAD_FAIL',
-  UpdateProgress: 'DOWNLOAD_CHANGE_PROGRESS'
-}
+  UpdateProgress: 'DOWNLOAD_CHANGE_PROGRESS',
+};
 
 export const DRMVideoState = {
   NOT_STARTED: -1,
@@ -35,12 +35,12 @@ export const DRMVideoState = {
   STATE_RESTARTING: 7,
 };
 
-export interface DRMVideoInfo{
-  id?: string,
-  url?: string
-  state?: number,
-  progress?: number
-  action: string,
+export interface DRMVideoInfo {
+  id?: string;
+  url?: string;
+  state?: number;
+  progress?: number;
+  action: string;
 }
 
 type DrmVideoDownloaderType = {
@@ -53,10 +53,13 @@ type DrmVideoDownloaderType = {
   getDownloadableStatus(
     videoRequestModel?: DRMVideoRequestModel
   ): Promise<number>;
-  getDownloadableInfo(videoRequestModel?: DRMVideoRequestModel): Promise<DRMVideoInfo>;
+  getDownloadableInfo(
+    videoRequestModel?: DRMVideoRequestModel
+  ): Promise<DRMVideoInfo>;
   registerTrackingEvent(): void;
   unregisterTrackingEvent(): void;
   clearAllListener(): void;
+  releaseResource(): void;
 };
 
 const { DrmVideoDownloader } = NativeModules;

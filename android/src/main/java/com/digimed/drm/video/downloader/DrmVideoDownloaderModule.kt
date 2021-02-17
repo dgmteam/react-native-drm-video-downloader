@@ -122,7 +122,7 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
   }
 
   @ReactMethod
-  fun release(){
+  fun releaseResource(){
     DownloadDrmVideoManager.getInstance().release()
   }
 
