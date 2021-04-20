@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DrmVideoDownloader from 'react-native-drm-video-downloader';

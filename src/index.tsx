@@ -41,6 +41,11 @@ export interface DRMVideoInfo {
   state?: number;
   progress?: number;
   action: string;
+  /**
+   * The key set id of an video.
+   * Only available for Android platform
+   */
+  keySetId?: string;
 }
 
 type DrmVideoDownloaderType = {
