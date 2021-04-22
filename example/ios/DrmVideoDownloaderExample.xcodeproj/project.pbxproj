@@ -147,6 +147,7 @@
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = BN43X6CN2M;
 						LastSwiftMigration = 1110;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -272,9 +273,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = BN43X6CN2M;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = DrmVideoDownloaderExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
@@ -286,8 +289,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.DrmVideoDownloaderExample.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.digimed.drmvideodownloadersample;
 				PRODUCT_NAME = DrmVideoDownloaderExample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "DrmVideoDownloaderExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
@@ -301,8 +305,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BN43X6CN2M;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = DrmVideoDownloaderExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = (
@@ -314,8 +320,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.DrmVideoDownloaderExample.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.DrmVideoDownloaderExample.DrmVideoDownloaderExample-new";
 				PRODUCT_NAME = DrmVideoDownloaderExample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "DrmVideoDownloaderExample-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				VERSIONING_SYSTEM = "apple-generic";

@@ -42,18 +42,16 @@ export const useApp = () => {
 
   const createModelForiOS = () => {
     setVideoRequestModel({
-      id: '7360f352-d459-475e-9351-970970b378e4',
-      licenseUrl:
-        'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
-      url:
-        'https://mvvuni-aase.streaming.media.azure.net/daa6aef5-c6c9-42ae-967b-ab190ad18a85/Big_Buck_Bunny_30s.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
+      id: 'e851bf95-3011-42c2-9556-33856c6ad0a6',
+      licenseUrl: 'https://mvvuni.keydelivery.southeastasia.media.azure.net/FairPlay/?kid=e851bf95-3011-42c2-9556-33856c6ad0a6',
+      url: 'https://mvvuni-aase.streaming.media.azure.net/72948a45-7fd9-4c6a-b527-8574d67ffb45/MVV_Uni_Trailer_2_d4f65e15_7f40_.ism/manifest(format=m3u8-aapl,encryption=cbcs-aapl)',
       scheme: 'fairplay',
       drmLicenseRequestHeaders: {
         Authorization:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiI3MzYwZjM1Mi1kNDU5LTQ3NWUtOTM1MS05NzA5NzBiMzc4ZTQiLCJuYmYiOjE2MDgxOTc5NDcsImV4cCI6MTYwODIwMTg0NywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.xecu5D_kZ8UShT9pqb_AlSYgy3G3rTrQY-zSN1prwpw',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cm46bWljcm9zb2Z0OmF6dXJlOm1lZGlhc2VydmljZXM6Y29udGVudGtleWlkZW50aWZpZXIiOiJlODUxYmY5NS0zMDExLTQyYzItOTU1Ni0zMzg1NmM2YWQwYTYiLCJuYmYiOjE2MTkwNjQ5MzcsImV4cCI6MTYxOTA2ODgzNywiaXNzIjoiaHR0cHM6Ly90b3BjbGFzLmNvbS52biIsImF1ZCI6InRvcGNsYXNzIn0.I59jbz_nLxZ3S2_K4ievh7yGTf27TUOg8N-OMTeNFy0',
       },
       contentKeyIds: [
-        'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=7360f352-d459-475e-9351-970970b378e4',
+        'skd://mvvuni-aase.streaming.media.azure.net/FairPlay/?kid=e851bf95-3011-42c2-9556-33856c6ad0a6'
       ],
       title: 'Demo video',
       isProtected: true,
