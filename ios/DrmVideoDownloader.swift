@@ -114,6 +114,11 @@ class DrmVideoDownloader: RCTEventEmitter {
     func clearAllListener(){
         self.unregisterTrackingEvent()
     }
+
+    @objc
+    func releaseResource(){
+    }
+
     override func supportedEvents() -> [String]! {
         return [Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME]
     }

@@ -37,4 +37,6 @@ RCT_EXTERN_METHOD(unregisterTrackingEvent)
 
 RCT_EXTERN_METHOD(clearAllListener)
 
+RCT_EXTERN_METHOD(releaseResource)
+
 @end
