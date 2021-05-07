@@ -202,7 +202,7 @@ class Utils private constructor(){
       this.dataSourceFactory = null;
       this.databaseProvider = null;
       this.downloadDirectory = null;
-      this.downloadManager?.release()
+//      this.downloadManager?.release()
       this.downloadManager = null;
       this.downloadNotificationHelper = null;
       this.downloadTracker = null;
