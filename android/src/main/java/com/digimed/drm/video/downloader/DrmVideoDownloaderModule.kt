@@ -21,6 +21,7 @@ import javax.annotation.Nullable
 class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Listener{
   private val TAG = "DrmVideoDownloaderModule"
   constructor(reactContext: ReactApplicationContext) : super(reactContext) {
+    DownloadDrmVideoManager.getInstance().initial(reactContext.applicationContext)
   }
 
   override fun getName(): String {
@@ -29,7 +30,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun isDownloaded(params: ReadableMap, promise: Promise){
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     var mediaItem = videoRequestModel?.toMediaItem()
     val isDownloaded = DownloadDrmVideoManager.getInstance().isDownload(mediaItem)
@@ -38,28 +38,24 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun pauseAllDownload(promise: Promise){
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().pauseAllDownload()
     promise.resolve(true)
   }
 
   @ReactMethod
   fun removeAllDownload(promise: Promise){
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().removeAllDownload()
     promise.resolve(true)
   }
 
   @ReactMethod
   fun resumeAllDownload(promise: Promise){
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().resumeAllDownload()
     promise.resolve(true)
   }
 
   @ReactMethod
   fun removeDownload(params: ReadableMap, promise: Promise){
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     var mediaItem = videoRequestModel?.toMediaItem()
     DownloadDrmVideoManager.getInstance().removeDownload(mediaItem)
@@ -68,7 +64,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun download(params: ReadableMap, promise: Promise) {
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     if (Utils.isValidRequest(videoRequestModel)) {
       var mediaItem = videoRequestModel?.toMediaItem()
@@ -81,7 +76,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun getDownloadableStatus(params: ReadableMap, promise: Promise) {
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     if (Utils.isValidRequest(videoRequestModel)) {
       var mediaItem = videoRequestModel?.toMediaItem()
@@ -94,7 +88,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun getDownloadableInfo(params: ReadableMap, promise: Promise) {
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     val videoRequestModel = Utils.getVideoRequestModelFrom(params)
     if (Utils.isValidRequest(videoRequestModel)) {
       var mediaItem = videoRequestModel?.toMediaItem()
@@ -107,7 +100,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
 
   @ReactMethod
   fun registerTrackingEvent(){
-    DownloadDrmVideoManager.getInstance().initial(reactApplicationContext)
     DownloadDrmVideoManager.getInstance().addListener(this)
   }
 
@@ -119,11 +111,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
   @ReactMethod
   fun clearAllListener(){
     DownloadDrmVideoManager.getInstance().clearListener()
-  }
-
-  @ReactMethod
-  fun releaseResource(){
-    DownloadDrmVideoManager.getInstance().release()
   }
 
   override fun onDownloadChanged(downloadManager: DownloadManager?, download: Download?, keySetId: String?) {

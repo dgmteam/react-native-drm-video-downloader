@@ -74,7 +74,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
 
   fun isDownloaded(mediaItem: MediaItem?): Boolean {
     val download = downloads!![Assertions.checkNotNull(mediaItem?.playbackProperties)?.uri]
-    return download != null && download.state != Download.STATE_COMPLETED
+    return download != null && download.state == Download.STATE_COMPLETED
   }
 
   fun getDownloadState(mediaItem: MediaItem?): Int {
@@ -100,10 +100,9 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
     if (download != null) {
       if (download.state == Download.STATE_COMPLETED) {
         this.onDownloadChanged(this.downloadManager!!, download, null)
-      } else {
+      } else if (download.state == Download.STATE_STOPPED){
         DownloadService.sendRemoveDownload(context!!, VideoDownloaderService::class.java, download.request.id,  /* foreground= */false)
       }
-    } else {
       val drmSchemeUuid = C.WIDEVINE_UUID
       val licenseDataSourceFactory: HttpDataSource.Factory = DefaultHttpDataSourceFactory()
       val drmCallback = HttpMediaDrmCallback(mediaItem.playbackProperties!!.drmConfiguration!!.licenseUri.toString(), licenseDataSourceFactory)
