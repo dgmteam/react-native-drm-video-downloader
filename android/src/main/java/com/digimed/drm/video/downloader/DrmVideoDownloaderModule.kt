@@ -1,6 +1,5 @@
 package com.digimed.drm.video.downloader
 
-import android.net.Uri
 import com.digimed.drm.video.downloader.extensions.toResult
 import com.digimed.drm.video.downloader.models.DRMVideoDownloadErrorModel
 import com.digimed.drm.video.downloader.trackers.DownloadDrmVideoManager
@@ -12,7 +11,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.offline.Download
 import com.google.android.exoplayer2.offline.DownloadManager
-import com.google.android.exoplayer2.offline.DownloadRequest
 import com.google.android.exoplayer2.util.Log
 import java.lang.Exception
 import javax.annotation.Nullable
@@ -21,7 +19,6 @@ import javax.annotation.Nullable
 class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Listener{
   private val TAG = "DrmVideoDownloaderModule"
   constructor(reactContext: ReactApplicationContext) : super(reactContext) {
-    DownloadDrmVideoManager.getInstance().initial(reactContext.applicationContext)
   }
 
   override fun getName(): String {
