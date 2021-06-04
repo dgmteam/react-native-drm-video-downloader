@@ -5,7 +5,7 @@ class DrmVideoDownloader: RCTEventEmitter {
         print("restorePersistenceManager")
         AssetPersistenceManager.sharedManager.restorePersistenceManager()
     }
-    
+
     @objc
     static func setDelegate(delegate: String?) {
         print("setDelegate")
@@ -29,7 +29,7 @@ class DrmVideoDownloader: RCTEventEmitter {
         }
         return ret
     }
-    
+
     @objc(download:withResolver:withRejecter:)
     func download(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
@@ -46,7 +46,7 @@ class DrmVideoDownloader: RCTEventEmitter {
             reject("1000", "The request is invalid", nil)
         }
     }
-    
+
     @objc(getDownloadableInfo:withResolver:withRejecter:)
     func getDownloadableInfo(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
@@ -59,7 +59,7 @@ class DrmVideoDownloader: RCTEventEmitter {
             reject("1000", "The request is invalid", nil)
         }
     }
-    
+
     @objc(getDownloadableStatus:withResolver:withRejecter:)
     func getDownloadableStatus(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
@@ -70,13 +70,13 @@ class DrmVideoDownloader: RCTEventEmitter {
             reject("1000", "The request is invalid", nil)
         }
     }
-    
+
     @objc(removeDownload:withResolver:withRejecter:)
     func removeDownload(params: NSDictionary, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-            if state == .downloaded {
+            if state == .downloaded || state == .failed {
                 self.deleteDownload(asset: asset)
             } else {
                 self.cancelDownload(asset: asset)
@@ -86,34 +86,35 @@ class DrmVideoDownloader: RCTEventEmitter {
             reject("1000", "The request is invalid", nil)
         }
     }
-    
+
     fileprivate func cancelDownload(asset:Asset) -> Void {
         AssetPersistenceManager.sharedManager.cancelDownload(for: asset)
     }
-    
+
     func deleteDownload(asset:Asset) -> Void {
         AssetPersistenceManager.sharedManager.deleteAsset(asset)
         ContentKeyManager.shared.contentKeyDelegate.deleteAllPeristableContentKeys(forAsset: asset)
     }
-    
+
     @objc
     func registerTrackingEvent(){
         print("register tracking event")
         AssetPersistenceManager.sharedManager.enableTrackingEvent()
         self.registerEventWithNotificationCenter()
     }
-    
+
     @objc
     func unregisterTrackingEvent(){
         print("unregister tracking event")
         AssetPersistenceManager.sharedManager.disableTrackingEvent()
         self.unregisterEventWithNotificationCenter()
     }
-    
+
     @objc
     func clearAllListener(){
         self.unregisterTrackingEvent()
     }
+
     override func supportedEvents() -> [String]! {
         return [Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME]
     }
@@ -131,7 +132,7 @@ extension DrmVideoDownloader {
                                        selector: #selector(handleAssetDownloadFailed(_:)),
                                        name: .AssetDownloadFail, object: nil)
     }
-    
+
     func unregisterEventWithNotificationCenter(){
         NotificationCenter.default.removeObserver(self,
                                                   name: .AssetDownloadStateChanged,
@@ -158,7 +159,7 @@ extension DrmVideoDownloader {
         }
         self.sendEvents(eventName: Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, params: asset.toResult(action: Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE))
     }
-    
+
     @objc
     func handleAssetDownloadProgress(_ notification: Notification){
         print("handleAssetDownloadProgress")

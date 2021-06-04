@@ -156,7 +156,9 @@ public class AssetPersistenceManager: NSObject {
         for (_, assetValue) in activeDownloadsMap where asset.stream.name == assetValue.stream.name {
             return .downloading
         }
-        
+        if (ContentKeyManager.shared.contentKeyDelegate.persistableContentKeyExistsOnDisk(forAsset: asset)){
+            return .failed
+        }
         return .notDownloaded
     }
     
