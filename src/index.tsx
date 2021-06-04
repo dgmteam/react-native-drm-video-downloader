@@ -64,7 +64,6 @@ type DrmVideoDownloaderType = {
   registerTrackingEvent(): void;
   unregisterTrackingEvent(): void;
   clearAllListener(): void;
-  releaseResource(): void;
 };
 
 const { DrmVideoDownloader } = NativeModules;

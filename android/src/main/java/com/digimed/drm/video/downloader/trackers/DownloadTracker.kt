@@ -74,7 +74,7 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
 
   fun isDownloaded(mediaItem: MediaItem?): Boolean {
     val download = downloads!![Assertions.checkNotNull(mediaItem?.playbackProperties)?.uri]
-    return download != null && download.state != Download.STATE_COMPLETED
+    return download != null && download.state == Download.STATE_COMPLETED
   }
 
   fun getDownloadState(mediaItem: MediaItem?): Int {
@@ -97,24 +97,24 @@ class DownloadTracker : DownloadManager.Listener, StartDownloadHelper.Listener {
   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
   fun download(mediaItem: MediaItem, renderersFactory: RenderersFactory, keyRequestProperty: Map<String, String>?) {
     val download = downloads!![Assertions.checkNotNull(mediaItem?.playbackProperties).uri]
-    if (download != null) {
-      DownloadService.sendRemoveDownload(
-        context!!, VideoDownloaderService::class.java, download.request.id,  /* foreground= */false)
-      stopTrackingProgressChanged()
-    } else {
-      val drmSchemeUuid = C.WIDEVINE_UUID
-      val licenseDataSourceFactory: HttpDataSource.Factory = DefaultHttpDataSourceFactory()
-      val drmCallback = HttpMediaDrmCallback(mediaItem.playbackProperties!!.drmConfiguration!!.licenseUri.toString(), licenseDataSourceFactory)
-      keyRequestProperty?.forEach {
-        drmCallback.setKeyRequestProperty(it.key, it.value)
-      }
-      val drmSessionManager: DefaultDrmSessionManager = DefaultDrmSessionManager.Builder()
-        .setUuidAndExoMediaDrmProvider(drmSchemeUuid, FrameworkMediaDrm.DEFAULT_PROVIDER)
-        .build(drmCallback)
-      startDownloadHelper = StartDownloadHelper(this.context?.applicationContext, mediaItem, drmSessionManager, DownloadHelper.forMediaItem(
-        mediaItem, DownloadHelper.getDefaultTrackSelectorParameters(context!!), renderersFactory, httpDataSourceFactory), this)
-      startTrackingProgressChanged()
+    if (download != null && download.state == Download.STATE_COMPLETED) {
+      this.onDownloadChanged(this.downloadManager!!, download, null)
+      return
+    } else if (download != null && download.state == Download.STATE_STOPPED) {
+      DownloadService.sendRemoveDownload(context!!, VideoDownloaderService::class.java, download.request.id,  /* foreground= */false)
     }
+    val drmSchemeUuid = C.WIDEVINE_UUID
+    val licenseDataSourceFactory: HttpDataSource.Factory = DefaultHttpDataSourceFactory()
+    val drmCallback = HttpMediaDrmCallback(mediaItem.playbackProperties!!.drmConfiguration!!.licenseUri.toString(), licenseDataSourceFactory)
+    keyRequestProperty?.forEach {
+      drmCallback.setKeyRequestProperty(it.key, it.value)
+    }
+    val drmSessionManager: DefaultDrmSessionManager = DefaultDrmSessionManager.Builder()
+            .setUuidAndExoMediaDrmProvider(drmSchemeUuid, FrameworkMediaDrm.DEFAULT_PROVIDER)
+            .build(drmCallback)
+    startDownloadHelper = StartDownloadHelper(this.context?.applicationContext, mediaItem, drmSessionManager, DownloadHelper.forMediaItem(
+            mediaItem, DownloadHelper.getDefaultTrackSelectorParameters(context!!), renderersFactory, httpDataSourceFactory), this)
+    startTrackingProgressChanged()
   }
 
   fun removeDownload(mediaItem: MediaItem?){
