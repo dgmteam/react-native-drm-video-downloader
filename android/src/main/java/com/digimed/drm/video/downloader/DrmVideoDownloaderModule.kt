@@ -111,12 +111,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
   }
 
   override fun onDownloadChanged(downloadManager: DownloadManager?, download: Download?, keySetId: String?) {
-    if (download?.state == Download.STATE_COMPLETED){
-      var downloadTracker = Utils.getDownloadTracker(this.reactApplicationContext)
-      var downloadRequest = downloadTracker?.getDownloadRequest(download.request.uri)
-      Log.d(TAG,  "onDownload completed");
-//      downloadTracker.getDownloadRequest(checkNotNull(item.playbackProperties).uri);
-    }
     sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, download?.toResult(Constants.EVENT_NAME_DOWNLOAD_CHANGE_STATE, keySetId = keySetId))
   }
 
@@ -125,12 +119,6 @@ class DrmVideoDownloaderModule : ReactContextBaseJavaModule, DownloadTracker.Lis
   }
 
   override fun onDownloadChangeProgress( download: Download?, keySetId: String?) {
-    if (download?.state == Download.STATE_COMPLETED){
-      var downloadTracker = Utils.getDownloadTracker(this.reactApplicationContext)
-      var downloadRequest = downloadTracker?.getDownloadRequest(download.request.uri)
-      Log.d(TAG,  "onDownload completed");
-//      downloadTracker.getDownloadRequest(checkNotNull(item.playbackProperties).uri);
-    }
     sendEvent(Constants.EVENT_DOWNLOAD_DRM_VIDEO_NAME, download?.toResult(Constants.EVENT_NAME_DOWNLOAD_CHANGE_PROGRESS, keySetId = keySetId))
   }
 
