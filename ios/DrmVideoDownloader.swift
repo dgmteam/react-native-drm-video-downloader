@@ -76,7 +76,7 @@ class DrmVideoDownloader: RCTEventEmitter {
         let videoRequestModel = Utils.getVideoRequestModelFrom(params: params)
         if Utils.isValidRequest(videoRequestModel: videoRequestModel), let asset = videoRequestModel?.toAsset() {
             let state = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-            if state == .downloaded {
+            if state == .downloaded || state == .failed {
                 self.deleteDownload(asset: asset)
             } else {
                 self.cancelDownload(asset: asset)

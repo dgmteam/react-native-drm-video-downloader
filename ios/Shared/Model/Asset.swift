@@ -52,6 +52,8 @@ extension Asset {
         
         /// The asset is downloaded and saved on diek.
         case downloaded
+        
+        case failed
     }
 }
 

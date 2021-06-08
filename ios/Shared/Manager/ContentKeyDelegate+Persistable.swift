@@ -193,6 +193,20 @@ extension ContentKeyDelegate {
         }
     }
     
+    func persistableContentKeyExistsOnDisk(forAsset asset: Asset) -> Bool {
+        var contentKeyIdentifier = "";
+        for contentKeyId in asset.stream.contentKeyIDList ?? [] {
+            let items = contentKeyId.components(separatedBy: "kid=")
+            if (items.count >= 2){
+                contentKeyIdentifier = items[1]
+            }
+            
+        }
+        let contentKeyURL = urlForPersistableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
+        let ret =  FileManager.default.fileExists(atPath: contentKeyURL.path)
+        return ret
+    }
+    
     /// Deletes a persistable key for a given content key identifier.
     ///
     /// - Parameter contentKeyIdentifier: The host value of an `AVPersistableContentKeyRequest`. (i.e. "tweleve" in "skd://tweleve").

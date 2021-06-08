@@ -46,6 +46,9 @@ class Utils {
         case .notDownloaded:
             ret = -1
             break
+        case .failed:
+            ret = 4
+            break
         default:
             ret = -1
             break
