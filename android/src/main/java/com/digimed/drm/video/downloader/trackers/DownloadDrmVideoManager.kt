@@ -82,9 +82,8 @@ class DownloadDrmVideoManager{
   }
 
   fun release(){
-    this.removeAllDownload()
-//    downloadTracker?.release()
-//    downloadTracker = null
-//    Utils.release()
+    downloadTracker?.release()
+    downloadTracker = null
+    Utils.release()
   }
 }
